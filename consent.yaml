@@ -1,0 +1,3382 @@
+openapi: 3.0.1
+info:
+  version: 'v1'
+  title: 'Consent Service'
+  description: 'Open Banking Platform PSD2 API - Consent'
+
+servers:
+  - url: https://api.dev.openbankingplatform.com/psd2/consents
+    description: Optional PSD2 test server
+
+security:
+  - oAuth2: [accountinformation,paymentinitiation]
+
+paths:
+  /v1/consents:
+    post:
+      summary: Create consent
+      description: | 
+        This method create a consent resource, defining access rights to dedicated accounts of 
+        a given PSU-ID. These accounts are addressed explicitly in the method as 
+        parameters as a core function.
+        
+        **Side Effects**
+        When this Consent Request is a request where the "recurringIndicator" equals "true", 
+        and if it exists already a former consent for recurring access on account information 
+        for the addressed PSU, then the former consent automatically expires as soon as the new 
+        consent request is authorized by the PSU.
+        
+        Optional Extension:
+        As an option, an ASPSP might optionally accept a specific access right on the access on all psd2 related services for all available accounts. 
+        
+        As another option an ASPSP might optionally also accept a command, where only access rights are inserted without mentioning the addressed account. 
+        The relation to accounts is then handled afterwards between PSU and ASPSP. 
+        This option is supported only within the Decoupled, OAuth2 or Re-direct SCA Approach. 
+        As a last option, an ASPSP might in addition accept a command with access rights
+          * to see the list of available payment accounts or
+          * to see the list of available payment accounts with balances.
+      operationId: createConsent
+      tags:
+        - Account Information Service (AIS)
+      security:
+        - oAuth2: [accountinformation]
+      parameters:
+        #path # NO PATH PARAMETER
+        #query # NO QUERY PARAMETER
+        #header
+          #common header parameter
+        - $ref: "#/components/parameters/X-BicFi"
+        - $ref: "#/components/parameters/X-Request-ID"
+          #header to support the signature function
+        - $ref: "#/components/parameters/Digest"
+        - $ref: "#/components/parameters/Signature"
+        - $ref: "#/components/parameters/TPP-Signature-Certificate"
+          #method specific header elements
+        - $ref: "#/components/parameters/PSU-ID"
+        - $ref: "#/components/parameters/PSU-ID-Type"
+        - $ref: "#/components/parameters/PSU-Corporate-ID"
+        - $ref: "#/components/parameters/PSU-Corporate-ID-Type"
+        - $ref: "#/components/parameters/TPP-Redirect-Preferred"
+        - $ref: "#/components/parameters/TPP-Redirect-URI"
+        - $ref: "#/components/parameters/TPP-Nok-Redirect-URI"
+        - $ref: "#/components/parameters/TPP-Explicit-Authorization-Preferred"
+          #optional additional PSU Information in header
+        - $ref: "#/components/parameters/PSU-IP-Address_optional"
+        - $ref: "#/components/parameters/PSU-IP-Port"
+        - $ref: "#/components/parameters/PSU-Accept"
+        - $ref: "#/components/parameters/PSU-Accept-Charset"
+        - $ref: "#/components/parameters/PSU-Accept-Encoding"
+        - $ref: "#/components/parameters/PSU-Accept-Language"
+        - $ref: "#/components/parameters/PSU-User-Agent"
+        - $ref: "#/components/parameters/PSU-Http-Method"
+        - $ref: "#/components/parameters/PSU-Device-ID"
+        - $ref: "#/components/parameters/PSU-Geo-Location"
+      requestBody:
+        $ref: "#/components/requestBodies/consents"
+      responses:
+        '201':
+          $ref: "#/components/responses/CREATED_201_Consents"
+        '400':
+          $ref: "#/components/responses/BAD_REQUEST_400"
+        '401':
+          $ref: "#/components/responses/UNAUTHORIZED_401"
+        '403':
+          $ref: "#/components/responses/FORBIDDEN_403"
+        '404':
+          $ref: "#/components/responses/NOT_FOUND_404"
+        '405':
+          $ref: "#/components/responses/METHOD_NOT_ALLOWED_405"
+        '406':
+          $ref: "#/components/responses/NOT_ACCEPTABLE_406"
+        '408':
+          $ref: "#/components/responses/REQUEST_TIMEOUT_408"
+        '409':
+          $ref: "#/components/responses/CONFLICT_409"
+        '412':
+          $ref: "#/components/responses/PRECONDITION_FAILED_412"
+        '415':
+          $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415"
+        '429':
+          $ref: "#/components/responses/TOO_MANY_REQUESTS_429"
+        '500':
+          $ref: "#/components/responses/INTERNAL_SERVER_ERROR_500"
+        '503':
+          $ref: "#/components/responses/SERVICE_UNAVAILABLE_503"
+
+  /v1/consents/{consentId}:
+    get:
+      summary: Get Consent Request
+      description: |
+        Returns the content of an account information consent object. 
+        This is returning the data for the TPP especially in cases, 
+        where the consent was directly managed between ASPSP and PSU e.g. in a re-direct SCA Approach.
+      operationId: getConsentInformation
+      tags:
+        - Account Information Service (AIS)
+      security:
+        - oAuth2: [accountinformation]
+      parameters:
+        #path
+        - $ref: "#/components/parameters/consentId_PATH"
+        #query # NO QUERY PARAMETER
+        #header
+          #common header parameter
+        - $ref: "#/components/parameters/X-BicFi"
+        - $ref: "#/components/parameters/X-Request-ID"
+          #header to support the signature function
+        - $ref: "#/components/parameters/Digest"
+        - $ref: "#/components/parameters/Signature"
+        - $ref: "#/components/parameters/TPP-Signature-Certificate"
+          #optional additional PSU Information in header
+        - $ref: "#/components/parameters/PSU-IP-Address_optional"
+        - $ref: "#/components/parameters/PSU-IP-Port"
+        - $ref: "#/components/parameters/PSU-Accept"
+        - $ref: "#/components/parameters/PSU-Accept-Charset"
+        - $ref: "#/components/parameters/PSU-Accept-Encoding"
+        - $ref: "#/components/parameters/PSU-Accept-Language"
+        - $ref: "#/components/parameters/PSU-User-Agent"
+        - $ref: "#/components/parameters/PSU-Http-Method"
+        - $ref: "#/components/parameters/PSU-Device-ID"
+        - $ref: "#/components/parameters/PSU-Geo-Location"
+      #NO REQUEST BODY
+      responses:
+        '200':
+          $ref: "#/components/responses/OK_200_ConsentInformation"
+        '400':
+          $ref: "#/components/responses/BAD_REQUEST_400"
+        '401':
+          $ref: "#/components/responses/UNAUTHORIZED_401"
+        '403':
+          $ref: "#/components/responses/FORBIDDEN_403"
+        '404':
+          $ref: "#/components/responses/NOT_FOUND_404"
+        '405':
+          $ref: "#/components/responses/METHOD_NOT_ALLOWED_405"
+        '406':
+          $ref: "#/components/responses/NOT_ACCEPTABLE_406"
+        '408':
+          $ref: "#/components/responses/REQUEST_TIMEOUT_408"
+        '409':
+          $ref: "#/components/responses/CONFLICT_409"
+        '412':
+          $ref: "#/components/responses/PRECONDITION_FAILED_412"
+        '415':
+          $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415"
+        '429':
+          $ref: "#/components/responses/TOO_MANY_REQUESTS_429"
+        '500':
+          $ref: "#/components/responses/INTERNAL_SERVER_ERROR_500"
+        '503':
+          $ref: "#/components/responses/SERVICE_UNAVAILABLE_503"
+
+    delete:
+      summary: Delete Consent
+      description: The TPP can delete an account information consent object if needed.
+      operationId: deleteConsent
+      tags:
+        - Account Information Service (AIS)
+      security:
+        - oAuth2: [accountinformation]
+      parameters:
+        #path
+        - $ref: "#/components/parameters/consentId_PATH"
+        #query # NO QUERY PARAMETER
+        #header
+          #common header parameter
+        - $ref: "#/components/parameters/X-BicFi"
+        - $ref: "#/components/parameters/X-Request-ID"
+          #header to support the signature function
+        - $ref: "#/components/parameters/Digest"
+        - $ref: "#/components/parameters/Signature"
+        - $ref: "#/components/parameters/TPP-Signature-Certificate"
+          #optional additional PSU Information in header
+        - $ref: "#/components/parameters/PSU-IP-Address_optional"
+        - $ref: "#/components/parameters/PSU-IP-Port"
+        - $ref: "#/components/parameters/PSU-Accept"
+        - $ref: "#/components/parameters/PSU-Accept-Charset"
+        - $ref: "#/components/parameters/PSU-Accept-Encoding"
+        - $ref: "#/components/parameters/PSU-Accept-Language"
+        - $ref: "#/components/parameters/PSU-User-Agent"
+        - $ref: "#/components/parameters/PSU-Http-Method"
+        - $ref: "#/components/parameters/PSU-Device-ID"
+        - $ref: "#/components/parameters/PSU-Geo-Location"
+      #NO REQUEST BODY
+      responses:
+        '204':
+          $ref: "#/components/responses/NO_CONTENT_204_Consents"
+        '400':
+          $ref: "#/components/responses/BAD_REQUEST_400"
+        '401':
+          $ref: "#/components/responses/UNAUTHORIZED_401"
+        '403':
+          $ref: "#/components/responses/FORBIDDEN_403"
+        '404':
+          $ref: "#/components/responses/NOT_FOUND_404"
+        '405':
+          $ref: "#/components/responses/METHOD_NOT_ALLOWED_405"
+        '406':
+          $ref: "#/components/responses/NOT_ACCEPTABLE_406"
+        '408':
+          $ref: "#/components/responses/REQUEST_TIMEOUT_408"
+        '409':
+          $ref: "#/components/responses/CONFLICT_409"
+        '412':
+          $ref: "#/components/responses/PRECONDITION_FAILED_412"
+        '415':
+          $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415"
+        '429':
+          $ref: "#/components/responses/TOO_MANY_REQUESTS_429"
+        '500':
+          $ref: "#/components/responses/INTERNAL_SERVER_ERROR_500"
+        '503':
+          $ref: "#/components/responses/SERVICE_UNAVAILABLE_503"
+
+  /v1/consents/{consentId}/status:
+    get:
+      summary: Consent status request
+      description: Read the status of an account information consent resource.
+      operationId: getConsentStatus
+      tags:
+        - Account Information Service (AIS)
+      security:
+        - oAuth2: [accountinformation]
+      parameters:
+        #path
+        - $ref: "#/components/parameters/consentId_PATH"
+        #query # NO QUERY PARAMETER
+        #header
+          #common header parameter
+        - $ref: "#/components/parameters/X-BicFi"
+        - $ref: "#/components/parameters/X-Request-ID"
+          #header to support the signature function
+        - $ref: "#/components/parameters/Digest"
+        - $ref: "#/components/parameters/Signature"
+        - $ref: "#/components/parameters/TPP-Signature-Certificate"
+          #optional additional PSU Information in header
+        - $ref: "#/components/parameters/PSU-IP-Address_optional"
+        - $ref: "#/components/parameters/PSU-IP-Port"
+        - $ref: "#/components/parameters/PSU-Accept"
+        - $ref: "#/components/parameters/PSU-Accept-Charset"
+        - $ref: "#/components/parameters/PSU-Accept-Encoding"
+        - $ref: "#/components/parameters/PSU-Accept-Language"
+        - $ref: "#/components/parameters/PSU-User-Agent"
+        - $ref: "#/components/parameters/PSU-Http-Method"
+        - $ref: "#/components/parameters/PSU-Device-ID"
+        - $ref: "#/components/parameters/PSU-Geo-Location"
+      #NO REQUEST BODY
+      responses:
+        '200':
+          $ref: "#/components/responses/OK_200_ConsentsStatus"
+        '400':
+          $ref: "#/components/responses/BAD_REQUEST_400"
+        '401':
+          $ref: "#/components/responses/UNAUTHORIZED_401"
+        '403':
+          $ref: "#/components/responses/FORBIDDEN_403"
+        '404':
+          $ref: "#/components/responses/NOT_FOUND_404"
+        '405':
+          $ref: "#/components/responses/METHOD_NOT_ALLOWED_405"
+        '406':
+          $ref: "#/components/responses/NOT_ACCEPTABLE_406"
+        '408':
+          $ref: "#/components/responses/REQUEST_TIMEOUT_408"
+        '409':
+          $ref: "#/components/responses/CONFLICT_409"
+        '412':
+          $ref: "#/components/responses/PRECONDITION_FAILED_412"
+        '415':
+          $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415"
+        '429':
+          $ref: "#/components/responses/TOO_MANY_REQUESTS_429"
+        '500':
+          $ref: "#/components/responses/INTERNAL_SERVER_ERROR_500"
+        '503':
+          $ref: "#/components/responses/SERVICE_UNAVAILABLE_503"
+
+  /v1/consents/{consentId}/authorizations:
+    post:
+      summary: Start the authorization process for a consent
+      description: | 
+        Create an authorization sub-resource and start the authorization process of a consent. 
+        The message might in addition transmit authentication and authorization related data.
+        
+        his method is iterated n times for a n times SCA authorization in a 
+        corporate context, each creating an own authorization sub-endpoint for 
+        the corresponding PSU authorizing the consent.
+        
+        The ASPSP might make the usage of this access method unnecessary, 
+        since the related authorization resource will be automatically created by 
+        the ASPSP after the submission of the consent data with the first POST consents call.
+        
+        The start authorization process is a process which is needed for creating a new authorization 
+        or cancellation sub-resource. 
+        
+        This applies in the following scenarios:
+        
+          * The ASPSP has indicated with an 'startAuthorization' hyperlink in the preceeding Payment 
+            Initiation Response that an explicit start of the authorization process is needed by the TPP. 
+            The 'startAuthorization' hyperlink can transport more information about data which needs to be 
+            uploaded by using the extended forms.
+            * 'startAuthorizationWithPsuIdentfication', 
+            * 'startAuthorizationWithPsuAuthentication'
+            * 'startAuthorizationWithAuthentciationMethodSelection' 
+          * The related payment initiation cannot yet be executed since a multilevel SCA is mandated.
+          * The ASPSP has indicated with an 'startAuthorization' hyperlink in the preceeding 
+            Payment Cancellation Response that an explicit start of the authorization process is needed by the TPP. 
+            The 'startAuthorization' hyperlink can transport more information about data which needs to be uploaded 
+            by using the extended forms as indicated above.
+          * The related payment cancellation request cannot be applied yet since a multilevel SCA is mandate for 
+            executing the cancellation.
+          * The signing basket needs to be authorized yet.
+      operationId: startConsentAuthorization
+      tags:
+        - Account Information Service (AIS)
+        - Common AIS and PIS Services
+      security:
+        - oAuth2: [accountinformation,paymentinitiation]
+      parameters:
+        #path
+        - $ref: "#/components/parameters/consentId_PATH"
+        #query # NO QUERY PARAMETER
+        #header
+          #common header parameter
+        - $ref: "#/components/parameters/X-BicFi"
+        - $ref: "#/components/parameters/X-Request-ID"
+          #header to support the signature function
+        - $ref: "#/components/parameters/Digest"
+        - $ref: "#/components/parameters/Signature"
+        - $ref: "#/components/parameters/TPP-Signature-Certificate"
+          #method specific header elements
+        - $ref: "#/components/parameters/PSU-ID"
+        - $ref: "#/components/parameters/PSU-ID-Type"
+        - $ref: "#/components/parameters/PSU-Corporate-ID"
+        - $ref: "#/components/parameters/PSU-Corporate-ID-Type"
+          #optional additional PSU Information in header
+        - $ref: "#/components/parameters/PSU-IP-Address_optional"
+        - $ref: "#/components/parameters/PSU-IP-Port"
+        - $ref: "#/components/parameters/PSU-Accept"
+        - $ref: "#/components/parameters/PSU-Accept-Charset"
+        - $ref: "#/components/parameters/PSU-Accept-Encoding"
+        - $ref: "#/components/parameters/PSU-Accept-Language"
+        - $ref: "#/components/parameters/PSU-User-Agent"
+        - $ref: "#/components/parameters/PSU-Http-Method"
+        - $ref: "#/components/parameters/PSU-Device-ID"
+        - $ref: "#/components/parameters/PSU-Geo-Location"
+      #NO REQUEST BODY
+      responses:
+        '201':
+          $ref: "#/components/responses/CREATED_201_StartScaProcess"
+        '400':
+          $ref: "#/components/responses/BAD_REQUEST_400"
+        '401':
+          $ref: "#/components/responses/UNAUTHORIZED_401"
+        '403':
+          $ref: "#/components/responses/FORBIDDEN_403"
+        '404':
+          $ref: "#/components/responses/NOT_FOUND_404"
+        '405':
+          $ref: "#/components/responses/METHOD_NOT_ALLOWED_405"
+        '406':
+          $ref: "#/components/responses/NOT_ACCEPTABLE_406"
+        '408':
+          $ref: "#/components/responses/REQUEST_TIMEOUT_408"
+        '409':
+          $ref: "#/components/responses/CONFLICT_409"
+        '412':
+          $ref: "#/components/responses/PRECONDITION_FAILED_412"
+        '415':
+          $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415"
+        '429':
+          $ref: "#/components/responses/TOO_MANY_REQUESTS_429"
+        '500':
+          $ref: "#/components/responses/INTERNAL_SERVER_ERROR_500"
+        '503':
+          $ref: "#/components/responses/SERVICE_UNAVAILABLE_503"
+
+    get:
+      summary: Get Consent Authorization Sub-Resources Request
+      description: |
+        Return a list of all authorization subresources IDs which have been created.
+        
+        This function returns an array of hyperlinks to all generated authorization sub-resources.
+      operationId: getPaymentInitiationAuthorization
+      tags:
+        - Payment Initiation Service (PIS)
+      security:
+        - oAuth2: [paymentinitiation]
+      parameters:
+        #path
+        - $ref: "#/components/parameters/consentId_PATH"
+        #query # NO QUERY PARAMETER
+        #header
+          #common header parameter
+        - $ref: "#/components/parameters/X-BicFi"
+        - $ref: "#/components/parameters/X-Request-ID"
+          #header to support the signature function
+        - $ref: "#/components/parameters/Digest"
+        - $ref: "#/components/parameters/Signature"
+        - $ref: "#/components/parameters/TPP-Signature-Certificate"
+          #optional additional PSU Information in header
+        - $ref: "#/components/parameters/PSU-IP-Address_optional"
+        - $ref: "#/components/parameters/PSU-IP-Port"
+        - $ref: "#/components/parameters/PSU-Accept"
+        - $ref: "#/components/parameters/PSU-Accept-Charset"
+        - $ref: "#/components/parameters/PSU-Accept-Encoding"
+        - $ref: "#/components/parameters/PSU-Accept-Language"
+        - $ref: "#/components/parameters/PSU-User-Agent"
+        - $ref: "#/components/parameters/PSU-Http-Method"
+        - $ref: "#/components/parameters/PSU-Device-ID"
+        - $ref: "#/components/parameters/PSU-Geo-Location"
+      #NO REQUEST BODY
+      responses:
+        '200':
+          $ref: "#/components/responses/OK_200_Authorizations"
+        '400':
+          $ref: "#/components/responses/BAD_REQUEST_400"
+        '401':
+          $ref: "#/components/responses/UNAUTHORIZED_401"
+        '403':
+          $ref: "#/components/responses/FORBIDDEN_403"
+        '404':
+          $ref: "#/components/responses/NOT_FOUND_404"
+        '405':
+          $ref: "#/components/responses/METHOD_NOT_ALLOWED_405"
+        '406':
+          $ref: "#/components/responses/NOT_ACCEPTABLE_406"
+        '408':
+          $ref: "#/components/responses/REQUEST_TIMEOUT_408"
+        '409':
+          $ref: "#/components/responses/CONFLICT_409"
+        '412':
+          $ref: "#/components/responses/PRECONDITION_FAILED_412"
+        '415':
+          $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415"
+        '429':
+          $ref: "#/components/responses/TOO_MANY_REQUESTS_429"
+        '500':
+          $ref: "#/components/responses/INTERNAL_SERVER_ERROR_500"
+        '503':
+          $ref: "#/components/responses/SERVICE_UNAVAILABLE_503"
+
+  /v1/consents/{consentId}/authorizations/{authorizationId}:
+    get:
+      summary: Read the SCA status of the consent authorization.
+      description: |
+        This method returns the SCA status of a consent initiation's authorization sub-resource.
+      operationId: getConsentScaStatus
+      tags:
+        - Account Information Service (AIS)
+        - Common AIS and PIS Services
+      security:
+        - oAuth2: [accountinformation,paymentinitiation]
+      parameters:
+        #path
+        - $ref: "#/components/parameters/consentId_PATH"
+        - $ref: "#/components/parameters/authorizationId"
+        #query # NO QUERY PARAMETER
+        #header
+          #common header parameter
+        - $ref: "#/components/parameters/X-BicFi"
+        - $ref: "#/components/parameters/X-Request-ID"
+          #header to support the signature function
+        - $ref: "#/components/parameters/Digest"
+        - $ref: "#/components/parameters/Signature"
+        - $ref: "#/components/parameters/TPP-Signature-Certificate"
+          #optional additional PSU Information in header
+        - $ref: "#/components/parameters/PSU-IP-Address_optional"
+        - $ref: "#/components/parameters/PSU-IP-Port"
+        - $ref: "#/components/parameters/PSU-Accept"
+        - $ref: "#/components/parameters/PSU-Accept-Charset"
+        - $ref: "#/components/parameters/PSU-Accept-Encoding"
+        - $ref: "#/components/parameters/PSU-Accept-Language"
+        - $ref: "#/components/parameters/PSU-User-Agent"
+        - $ref: "#/components/parameters/PSU-Http-Method"
+        - $ref: "#/components/parameters/PSU-Device-ID"
+        - $ref: "#/components/parameters/PSU-Geo-Location"
+      #NO REQUEST BODY
+      responses:
+        '200':
+          $ref: "#/components/responses/OK_200_ScaStatus"
+        '400':
+          $ref: "#/components/responses/BAD_REQUEST_400"
+        '401':
+          $ref: "#/components/responses/UNAUTHORIZED_401"
+        '403':
+          $ref: "#/components/responses/FORBIDDEN_403"
+        '404':
+          $ref: "#/components/responses/NOT_FOUND_404"
+        '405':
+          $ref: "#/components/responses/METHOD_NOT_ALLOWED_405"
+        '406':
+          $ref: "#/components/responses/NOT_ACCEPTABLE_406"
+        '408':
+          $ref: "#/components/responses/REQUEST_TIMEOUT_408"
+        '409':
+          $ref: "#/components/responses/CONFLICT_409"
+        '412':
+          $ref: "#/components/responses/PRECONDITION_FAILED_412"
+        '415':
+          $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415"
+        '429':
+          $ref: "#/components/responses/TOO_MANY_REQUESTS_429"
+        '500':
+          $ref: "#/components/responses/INTERNAL_SERVER_ERROR_500"
+        '503':
+          $ref: "#/components/responses/SERVICE_UNAVAILABLE_503"
+
+    put:
+      summary: Update PSU Data for consents
+      description: |  
+        This method update PSU data on the consents  resource if needed. 
+        It may authorize a consent within the Embedded SCA Approach where needed.
+        
+        Independently from the SCA Approach it supports e.g. the selection of 
+        the authentication method and a non-SCA PSU authentication.
+        
+        This methods updates PSU data on the cancellation authorization resource if needed. 
+
+        There are several possible Update PSU Data requests in the context of a consent request if needed, 
+        which depends on the SCA approach:
+        
+        * Redirect SCA Approach:
+          A specific Update PSU Data Request is applicable for 
+            * the selection of authentication methods, before choosing the actual SCA approach.
+        * Decoupled SCA Approach:
+          A specific Update PSU Data Request is only applicable for
+          * adding the PSU Identification, if not provided yet in the Payment Initiation Request or the Account Information Consent Request, or if no OAuth2 access token is used, or
+          * the selection of authentication methods.
+        * Embedded SCA Approach: 
+          The Update PSU Data Request might be used 
+          * to add credentials as a first factor authentication data of the PSU and
+          * to select the authentication method and
+          * transaction authorization.
+      
+        The SCA Approach might depend on the chosen SCA method. 
+        For that reason, the following possible Update PSU Data request can apply to all SCA approaches:
+        
+        * Select an SCA method in case of several SCA methods are available for the customer.
+      
+        There are the following request types on this access path:
+          * Update PSU Identification
+          * Update PSU Authentication
+          * Select PSU Autorization Method 
+            WARNING: This method need a reduced header, 
+            therefore many optional elements are not present. 
+            Maybe in a later version the access path will change.
+          * Transaction Authorization
+            WARNING: This method need a reduced header, 
+            therefore many optional elements are not present. 
+            Maybe in a later version the access path will change.
+      operationId: updateConsentsPsuData
+      tags:
+        - Account Information Service (AIS)
+        - Common AIS and PIS Services
+      security:
+        - oAuth2: [accountinformation,paymentinitiation]
+      parameters:
+        #query # NO QUERY PARAMETER
+        #header
+        #path
+        - $ref: "#/components/parameters/consentId_PATH"
+        - $ref: "#/components/parameters/authorizationId"
+          #common header parameter
+        - $ref: "#/components/parameters/X-BicFi"
+        - $ref: "#/components/parameters/X-Request-ID"
+          #header to support the signature function
+        - $ref: "#/components/parameters/Digest"
+        - $ref: "#/components/parameters/Signature"
+        - $ref: "#/components/parameters/TPP-Signature-Certificate"
+         #method specific header elements # Not always allowed depending on the kind of update which is ask for
+        - $ref: "#/components/parameters/PSU-ID"
+        - $ref: "#/components/parameters/PSU-ID-Type"
+        - $ref: "#/components/parameters/PSU-Corporate-ID"
+        - $ref: "#/components/parameters/PSU-Corporate-ID-Type"
+          #optional additional PSU Information in header
+        - $ref: "#/components/parameters/PSU-IP-Address_optional"
+        - $ref: "#/components/parameters/PSU-IP-Port"
+        - $ref: "#/components/parameters/PSU-Accept"
+        - $ref: "#/components/parameters/PSU-Accept-Charset"
+        - $ref: "#/components/parameters/PSU-Accept-Encoding"
+        - $ref: "#/components/parameters/PSU-Accept-Language"
+        - $ref: "#/components/parameters/PSU-User-Agent"
+        - $ref: "#/components/parameters/PSU-Http-Method"
+        - $ref: "#/components/parameters/PSU-Device-ID"
+        - $ref: "#/components/parameters/PSU-Geo-Location"
+      requestBody:
+        content: 
+          application/json:
+            schema:
+              oneOf:
+                - {} #Update PSU Identification 
+                - $ref: "#/components/schemas/updatePsuAuthentication" #Update PSU Authentication
+                - $ref: "#/components/schemas/selectPsuAuthenticationMethod" #Select PSU Authentication Method
+                - $ref: "#/components/schemas/transactionAuthorization" #Transaction Authorization
+            examples:
+              "Update PSU Identification/Additional SCA Process (Embedded Approach)":
+                value: {}
+              "Update PSU Authentication (Embedded Approach)":
+                $ref: "#/components/examples/updatePsuAuthenticationExample_Embedded"
+              "Select PSU Authentication Method (Embedded Approach)":
+                $ref: "#/components/examples/selectPsuAuthenticationMethodExample_Embedded"
+              "Transaction Authorization (Embedded Approach)":
+                $ref: "#/components/examples/transactionAuthorizationExample_Embedded"
+      responses:
+        '200':
+          $ref: "#/components/responses/OK_200_UpdatePsuData"
+        '400':
+          $ref: "#/components/responses/BAD_REQUEST_400"
+        '401':
+          $ref: "#/components/responses/UNAUTHORIZED_401"
+        '403':
+          $ref: "#/components/responses/FORBIDDEN_403"
+        '404':
+          $ref: "#/components/responses/NOT_FOUND_404"
+        '405':
+          $ref: "#/components/responses/METHOD_NOT_ALLOWED_405"
+        '406':
+          $ref: "#/components/responses/NOT_ACCEPTABLE_406"
+        '408':
+          $ref: "#/components/responses/REQUEST_TIMEOUT_408"
+        '409':
+          $ref: "#/components/responses/CONFLICT_409"
+        '412':
+          $ref: "#/components/responses/PRECONDITION_FAILED_412"
+        '415':
+          $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415"
+        '429':
+          $ref: "#/components/responses/TOO_MANY_REQUESTS_429"
+        '500':
+          $ref: "#/components/responses/INTERNAL_SERVER_ERROR_500"
+        '503':
+          $ref: "#/components/responses/SERVICE_UNAVAILABLE_503"
+
+components:
+#####################################################
+# Predefined Components
+#####################################################
+
+  securitySchemes:
+    oAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: 'https://auth.dev.openbankingplatform.com/connect/authorize'
+          tokenUrl: 'https://auth.dev.openbankingplatform.com/connect/token'
+          refreshUrl: 'https://auth.dev.openbankingplatform.com/connect/token'
+          scopes:
+            accountinformation: Account Information
+            paymentinitiation: Payment Initiation
+
+  schemas:
+  #####################################################
+  # Predefined Schemas
+  #####################################################
+
+    updatePsuAuthentication: 
+      description: |
+        Content of the body of a Update PSU Authentication Request
+        
+        Password subfield is used.
+      type: object
+      required: 
+        - psuData
+      properties:
+        psuData:
+          $ref: "#/components/schemas/psuData"
+
+    psuData:
+      description: PSU Data for Update PSU Authentication.
+      type: object
+      required:
+        - password
+      properties:
+        password:
+          description: Password
+          type: string
+
+    psuMessageText:
+      description: Text to be displayed to the PSU
+      type: string
+      maxLength: 512
+
+    selectPsuAuthenticationMethod:
+      description: |
+        Content of the body of a Select PSU Authentication Method Request
+      type: object
+      required: 
+        - authenticationMethodId
+      properties:
+        authenticationMethodId:
+          $ref: "#/components/schemas/authenticationMethodId"
+
+    authenticationMethodId:
+      description: |
+            An identification provided by the ASPSP for the later identification of the authentication method selection.
+      type: string
+      maxLength: 35
+      example: "myAuthenticationID"
+
+    transactionAuthorization:
+      description: |
+        Content of the body of a Transaction Authorization Request
+      type: object
+      required: 
+        - scaAuthenticationData
+      properties:
+        scaAuthenticationData:
+          $ref: "#/components/schemas/scaAuthenticationData"
+
+    scaAuthenticationData:
+      description: |
+        SCA authentication data, depending on the chosen authentication method. 
+        If the data is binary, then it is base64 encoded.
+      type: string
+
+    authorizationId:
+      description: Resource identification of the related SCA 
+      type: string
+      example: "123auth456"
+
+    consentId:
+      description: |
+        ID of the corresponding consent object as returned by an Account Information Consent Request.
+      type: string
+
+    consents:
+      description: |
+        Content of the body of a consent request.
+      type: object
+      required:
+        - access
+        - recurringIndicator
+        - validUntil
+        - frequencyPerDay
+        - combinedServiceIndicator
+      properties:
+        access:
+          $ref: "#/components/schemas/accountAccess"
+        recurringIndicator:
+          $ref: "#/components/schemas/recurringIndicator"
+        validUntil:
+          $ref: "#/components/schemas/validUntil"
+        frequencyPerDay:
+          $ref: "#/components/schemas/frequencyPerDay"
+        combinedServiceIndicator:
+          description: |
+            If "true" indicates that a payment initiation service will be addressed in the same "session".
+          type: boolean
+          example: false
+
+    accountAccess:
+      description: |
+        Requested access services for a consent.
+      type: object
+      properties:
+        accounts:
+          description: |
+            Is asking for detailed account information. 
+            
+            If the array is empty, the TPP is asking for an accessible account list. 
+            This may be restricted in a PSU/ASPSP authorization dialogue.
+            If the array is empty, also the arrays for balances or transactions shall be empty, if used.
+          type: array
+          items:
+            oneOf: 
+              - $ref: "#/components/schemas/accountReferenceIban"
+              - $ref: "#/components/schemas/accountReferenceBban"
+              - $ref: "#/components/schemas/accountReferencePan"
+              - $ref: "#/components/schemas/accountReferenceMaskedPan"
+              - $ref: "#/components/schemas/accountReferenceMsisdn"
+        balances:
+          description: |
+            Is asking for balances of the addressed accounts.
+            
+            If the array is empty, the TPP is asking for the balances of all accessible account lists. 
+            This may be restricted in a PSU/ASPSP authorization dialogue.
+            If the array is empty, also the arrays for accounts or transactions shall be empty, if used.
+          type: array
+          items:
+            oneOf: 
+              - $ref: "#/components/schemas/accountReferenceIban"
+              - $ref: "#/components/schemas/accountReferenceBban"
+              - $ref: "#/components/schemas/accountReferencePan"
+              - $ref: "#/components/schemas/accountReferenceMaskedPan"
+              - $ref: "#/components/schemas/accountReferenceMsisdn"
+        transactions:
+          description: |
+            Is asking for transactions of the addressed accounts. 
+            
+            If the array is empty, the TPP is asking for the transactions of all accessible account lists. 
+            This may be restricted in a PSU/ASPSP authorization dialogue.
+            If the array is empty, also the arrays for accounts or balances shall be empty, if used.
+          type: array
+          items:
+            oneOf: 
+              - $ref: "#/components/schemas/accountReferenceIban"
+              - $ref: "#/components/schemas/accountReferenceBban"
+              - $ref: "#/components/schemas/accountReferencePan"
+              - $ref: "#/components/schemas/accountReferenceMaskedPan"
+              - $ref: "#/components/schemas/accountReferenceMsisdn"
+        availableAccounts:
+          description: |
+            Optional if supported by API provider.
+            
+            Only the values "allAccounts" or "allAccountsWithBalances" is admitted.
+          type: string
+          enum:
+            - "allAccounts"
+            - "allAccountsWithBalances"
+        allPsd2:
+          description: |
+            Optional if supported by API provider.
+            
+            Only the value "allAccounts" is admitted.
+          type: string
+          enum:
+            - "allAccounts"
+
+    recurringIndicator:
+      description: |
+        "true", if the consent is for recurring access to the account data.
+        
+        "false", if the consent is for one access to the account data.
+      type: boolean
+      example: false
+
+    validUntil:
+      description: |
+        This parameter is requesting a valid until date for the requested consent. 
+        The content is the local ASPSP date in ISO-Date Format, e.g. 2017-10-30. 
+        
+        If a maximal available date is requested, a date in far future is to be used: "9999-12-31". 
+        The consent object to be retrieved by the GET Consent Request will contain the adjusted date.
+      type: string
+      format: date
+      example: "2020-12-31"
+
+    frequencyPerDay:
+      description: |
+        This field indicates the requested maximum frequency for an access per day.
+        For a one-off access, this attribute is set to "1".
+      type: integer
+      example: 4
+
+    authorizationsList:
+      description: An array of all authorizationIds 
+      type: array
+      items:
+        $ref: "#/components/schemas/authorizationId"
+
+    authorizations:
+      description: An array of all authorizationIds 
+      type: object
+      required:
+        - authorizationIds
+      properties:
+        authorizationIds:
+          $ref: "#/components/schemas/authorizationsList"
+
+    accountReferenceIban:
+      type: object
+      description: |
+        Reference to an account by the Primary Account Number (PAN) of a card, 
+        can be tokenised by the ASPSP due to PCI DSS requirements.
+      required:
+        - iban
+      properties:
+        iban: 
+          $ref: "#/components/schemas/iban"
+        currency:
+          $ref: "#/components/schemas/currencyCode"
+
+    accountReferenceBban:
+      type: object
+      description: |
+        Reference to an Account.
+        
+        This data elements is used for payment accounts which have no IBAN.
+      required:
+        - bban
+      properties:
+        bban: 
+          $ref: "#/components/schemas/bban"
+        currency:
+          $ref: "#/components/schemas/currencyCode"
+
+    accountReferencePan:
+      type: object
+      description: |
+        Reference to an account by the Primary Account Number (PAN) of a card, 
+        can be tokenised by the ASPSP due to PCI DSS requirements. 
+      required:
+        - pan
+      properties:
+        pan: 
+          $ref: "#/components/schemas/pan"
+        currency:
+          $ref: "#/components/schemas/currencyCode"
+
+    accountReferenceMaskedPan:
+      type: object
+      description: |
+        Reference to an account by the Primary Account Number (PAN) of a card in a masked form.
+      required:
+        - maskedPan
+      properties:
+        maskedPan: 
+          $ref: "#/components/schemas/maskedPan"
+        currency:
+          $ref: "#/components/schemas/currencyCode"
+
+    accountReferenceMsisdn:
+      type: object
+      description: |
+        An alias to access a payment account via a registered mobile phone number.
+      required:
+        - msisdn
+      properties:
+        msisdn: 
+          $ref: "#/components/schemas/msisdn"
+        currency:
+          $ref: "#/components/schemas/currencyCode"
+
+    pan:
+      description: |
+        Primary Account Number according to ISO/IEC 7812.
+      type: string
+      maxLength: 35
+      #According to ISO the following should be valid.
+      #maxLength: 19
+      #minLength: 8
+      #pattern: "[0-9]{8,19}"
+      example: "5409050000000000"
+
+    maskedPan:
+      description: |
+        Masked Primary Account Number
+      type: string
+      maxLength: 35
+      example: "123456xxxxxx1234"
+
+    bban:
+      description: |
+        Basic Bank Account Number (BBAN) Identifier
+        
+        This data element can be used in the body of the Consent Request
+          Message for retrieving Account access Consent from this Account. This
+          data elements is used for payment Accounts which have no IBAN.
+          ISO20022: Basic Bank Account Number (BBAN). 
+          
+          Identifier used nationally by financial institutions, i.e., in individual countries, 
+          generally as part of a National Account Numbering Scheme(s), 
+          which uniquely identifies the account of a customer.
+      type: string
+      pattern: "[a-zA-Z0-9]{1,30}" 
+      example: "BARC12345612345678"
+
+    msisdn:
+      type: string
+      maxLength: 35
+      description: Mobile phone number.
+      example: "+49 170 1234567"
+
+    iban:
+      type: string
+      description: IBAN of an account
+      pattern: "[A-Z]{2,2}[0-9]{2,2}[a-zA-Z0-9]{1,30}"
+      example: "FR7612345987650123456789014"
+
+    currencyCode:
+      description: |
+        ISO 4217 Alpha 3 currency code
+      type: string
+      pattern: "[A-Z]{3}"
+      example: "EUR"
+
+    scaStatusResponse:
+      description: Body of the JSON response with SCA Status
+      type: object
+      properties:
+        scaStatus:
+          $ref: "#/components/schemas/scaStatus"
+
+    startScaprocessResponse:
+      description: Body of the JSON response for a Start SCA authorization request.
+      type: object
+      required:
+        - scaStatus
+        - _links
+      properties:
+        scaStatus:
+          $ref: "#/components/schemas/scaStatus"
+        scaMethods:
+          $ref: "#/components/schemas/scaMethods"
+        chosenScaMethod:
+          $ref: "#/components/schemas/chosenScaMethod"
+        challengeData:
+          $ref: "#/components/schemas/challengeData"
+        _links:
+           $ref: "#/components/schemas/_linksStartScaProcess"
+        psuMessage:
+          $ref: "#/components/schemas/psuMessageText"
+
+    updatePsuIdenticationResponse:
+      description: Body of the JSON response for a successful update PSU Identification request.
+      type: object
+      required:
+        - _links
+        - scaStatus
+      properties:
+        _links:
+          $ref: "#/components/schemas/_linksUpdatePsuIdentification"
+        scaStatus:
+          $ref: "#/components/schemas/scaStatus"
+        psuMessage:
+          $ref: "#/components/schemas/psuMessageText"
+
+    updatePsuAuthenticationResponse:
+      description: Body of the JSON response for a successful update PSU Authentication request.
+      type: object
+      required:
+        - scaStatus
+      properties:
+        chosenScaMethod:
+          $ref: "#/components/schemas/chosenScaMethod"
+        challengeData:
+          $ref: "#/components/schemas/challengeData"
+        scaMethods:
+          $ref: "#/components/schemas/scaMethods"
+        _links:
+          $ref: "#/components/schemas/_linksUpdatePsuAuthentication"
+        scaStatus:
+          $ref: "#/components/schemas/scaStatus"
+        psuMessage:
+          $ref: "#/components/schemas/psuMessageText"
+
+    selectPsuAuthenticationMethodResponse:
+      description: Body of the JSON response for a successful select PSU Authentication Method request.
+      type: object
+      required:
+        - scaStatus
+      properties:
+        chosenScaMethod:
+          $ref: "#/components/schemas/chosenScaMethod"
+        challengeData:
+          $ref: "#/components/schemas/challengeData"
+        _links:
+          $ref: "#/components/schemas/_linksSelectPsuAuthenticationMethod"
+        scaStatus:
+          $ref: "#/components/schemas/scaStatus"
+        psuMessage:
+          $ref: "#/components/schemas/psuMessageText"
+
+    scaStatus:
+      description: |
+        This data element is containing information about the status of the SCA method applied. 
+        
+        The following codes are defined for this data type.
+        
+          * 'received':
+            An authorization or cancellation-authorization resource has been created successfully.
+          * 'psuIdentified':
+            The PSU related to the authorization or cancellation-authorization resource has been identified.
+          * 'psuAuthenticated':
+            The PSU related to the authorization or cancellation-authorization resource has been identified and authenticated e.g. by a password or by an access token.
+          * 'scaMethodSelected':
+            The PSU/TPP has selected the related SCA routine. 
+            If the SCA method is chosen implicitly since only one SCA method is available, 
+            then this is the first status to be reported instead of 'received'.
+          * 'started':
+            The addressed SCA routine has been started.
+          * 'finalized':
+            The SCA routine has been finalized successfully.
+          * 'failed':
+            The SCA routine failed
+          * 'exempted':
+            SCA was exempted for the related transaction, the related authorization is successful.
+      type: string
+      enum:
+        - "received"
+        - "psuIdentified"
+        - "psuAuthenticated"
+        - "scaMethodSelected"
+        - "started"
+        - "finalized"
+        - "failed"
+        - "exempted"
+        
+      example: "psuAuthenticated"
+
+    scaMethods:
+      description: |
+        This data element might be contained, if SCA is required and if the PSU has a choice between different
+        authentication methods.
+        
+        Depending on the risk management of the ASPSP this choice might be offered before or after the PSU
+        has been identified with the first relevant factor, or if an access token is transported.
+        
+        If this data element is contained, then there is also an hyperlink of type 'startAuthorizationWithAuthenticationMethodSelection'
+        contained in the response body.
+        
+        These methods shall be presented towards the PSU for selection by the TPP.
+
+      type: array
+      items:
+        $ref: "#/components/schemas/authenticationObject"
+
+    chosenScaMethod:
+      # description: |
+      #  This data element is only contained in the response if the APSPS has chosen the Embedded SCA Approach,
+      #  if the PSU is already identified e.g. with the first relevant factor or alternatively an access token,
+      #  if SCA is required and if the authentication method is implicitly selected.
+      $ref: "#/components/schemas/authenticationObject"
+
+    authenticationType:
+      description: |
+        Type of the authentication method.
+        
+        More authentication types might be added during implementation projects and documented in the ASPSP documentation.
+        
+          - 'SMS_OTP': An SCA method, where an OTP linked to the transaction to be authorized is sent to the PSU through a SMS channel.
+          - 'CHIP_OTP': An SCA method, where an OTP is generated by a chip card, e.g. an TOP derived from an EMV cryptogram. 
+            To contact the card, the PSU normally needs a (handheld) device. 
+            With this device, the PSU either reads the challenging data through a visual interface like flickering or 
+            the PSU types in the challenge through the device key pad. 
+            The device then derives an OTP from the challenge data and displays the OTP to the PSU.
+          - 'PHOTO_OTP': An SCA method, where the challenge is a QR code or similar encoded visual data 
+            which can be read in by a consumer device or specific mobile app. 
+            The device resp. the specific app than derives an OTP from the visual challenge data and displays 
+            the OTP to the PSU.
+          - 'PUSH_OTP': An OTP is pushed to a dedicated authentication APP and displayed to the PSU.
+        
+      type: string
+      enum:
+        - "SMS_OTP"
+        - "CHIP_OTP"
+        - "PHOTO_OTP"
+        - "PUSH_OTP"
+
+    authenticationObject:
+      description: |
+        Authentication Object
+      type: object
+      required:
+        - authenticationType
+        - authenticationMethodId
+      properties:
+        authenticationType:
+          $ref: "#/components/schemas/authenticationType"
+        authenticationVersion:
+          description: |
+            Depending on the "authenticationType".
+            This version can be used by differentiating authentication tools used within performing OTP generation in the same authentication type.
+            This version can be referred to in the ASPSP?s documentation.
+          type: string
+        authenticationMethodId:
+          $ref: "#/components/schemas/authenticationMethodId"
+        name:
+          description: |
+            This is the name of the authentication method defined by the PSU in the Online Banking frontend of the ASPSP.
+            Alternatively this could be a description provided by the ASPSP like "SMS OTP on phone +49160 xxxxx 28".
+            This name shall be used by the TPP when presenting a list of authentication methods to the PSU, if available.
+          type: string
+          example: "SMS OTP on phone +49160 xxxxx 28"
+        explanation:
+          description: |
+            Detailed information about the SCA method for the PSU.
+          type: string
+          example: Detailed information about the SCA method for the PSU.
+
+    challengeData:
+      description: |
+        It is contained in addition to the data element 'chosenScaMethod' if challenge data is needed for SCA.
+        In rare cases this attribute is also used in the context of the 'startAuthorizationWithPsuAuthentication' link.
+      type: object
+      properties:
+        image:
+          type: string
+          format: byte
+          description: |
+            PNG data (max. 512 kilobyte) to be displayed to the PSU,
+            Base64 encoding, cp. [RFC4648].
+            This attribute is used only, when PHOTO_OTP or CHIP_OTP
+            is the selected SCA method.
+        data:
+          type: string
+          description: String challenge data
+        imageLink:
+          type: string
+          format: url
+          description: A link where the ASPSP will provides the challenge image for the TPP.
+        otpMaxLength:
+          type: integer
+          description: The maximal length for the OTP to be typed in by the PSU.
+        otpFormat:
+          type: string
+          description: The format type of the OTP to be typed in. The admitted values are "characters" or "integer".
+          enum:
+            - "characters"
+            - "integer"
+        additionalInformation:
+          type: string
+          description: |
+            Additional explanation for the PSU to explain
+            e.g. fallback mechanism for the chosen SCA method.
+            The TPP is obliged to show this to the PSU.
+
+    _linksStartScaProcess: #TODO Check wether different link types can be joined
+      description: |
+        A list of hyperlinks to be recognised by the TPP. The actual hyperlinks used in the 
+        response depend on the dynamical decisions of the ASPSP when processing the request.
+        
+        **Remark:** All links can be relative or full links, to be decided by the ASPSP.
+        
+        Type of links admitted in this response, (further links might be added for ASPSP defined 
+        extensions):
+        
+        - 'scaRedirect': 
+          In case of an SCA Redirect Approach, the ASPSP is transmitting the link to which to 
+          redirect the PSU browser.
+        - 'scaOAuth': 
+          In case of a SCA OAuth2 Approach, the ASPSP is transmitting the URI where the configuration of the Authorization Server can be retrieved. The configuration follows the OAuth 2.0 Authorization Server Metadata specification.
+        - 'updatePsuIdentification': 
+          The link to the authorization or cancellation authorization sub-resource, 
+          where PSU identification data needs to be uploaded.
+        - 'startAuthorizationWithPsuAuthentication':
+          The link to the authorization or cancellation authorization sub-resource, 
+          where PSU authentication data needs to be uploaded.
+        - 'selectAuthenticationMethod':
+          The link to the authorization or cancellation authorization sub-resource, 
+          where the selected authentication method needs to be uploaded. 
+          This link is contained under exactly the same conditions as the data element 'scaMethods'.
+        - 'authorizeTransaction':
+          The link to the authorization or cancellation authorization sub-resource, 
+          where the authorization data has to be uploaded, e.g. the TOP received by SMS. 
+        - 'scaStatus': 
+          The link to retrieve the scaStatus of the corresponding authorization sub-resource. 
+      type: object
+      additionalProperties: 
+        $ref: "#/components/schemas/hrefType"
+      properties:
+        scaRedirect:
+          $ref: "#/components/schemas/hrefType"
+        scaOAuth: 
+          $ref: "#/components/schemas/hrefType"
+        updatePsuIdentification: 
+          $ref: "#/components/schemas/hrefType"
+        startAuthorizationWithPsuAuthentication:
+          $ref: "#/components/schemas/hrefType"
+        selectAuthenticationMethod:
+          $ref: "#/components/schemas/hrefType"
+        authorizeTransaction:
+          $ref: "#/components/schemas/hrefType"
+        scaStatus: 
+          $ref: "#/components/schemas/hrefType"
+
+    _linksUpdatePsuIdentification:
+      description: |
+        A list of hyperlinks to be recognised by the TPP. The actual hyperlinks used in the response depend on the dynamical decisions of the ASPSP when processing the request.
+        
+        **Remark:** All links can be relative or full links, to be decided by the ASPSP.
+        
+        Type of links admitted in this response, (further links might be added for ASPSP 
+        defined extensions):
+        
+        - 'scaStatus': The link to retrieve the scaStatus of the corresponding authorization sub-resource.
+      type: object
+      additionalProperties: 
+        $ref: "#/components/schemas/hrefType"
+      properties:
+        scaStatus:
+          $ref: "#/components/schemas/hrefType"
+
+    _linksUpdatePsuAuthentication:
+      description: |
+        A list of hyperlinks to be recognised by the TPP. Might be contained, if several authentication methods 
+        are available for the PSU.
+        Type of links admitted in this response:
+          * 'selectAuthenticationMethod': 
+            This is a link to a resource, where the TPP can select the applicable second factor authentication 
+            methods for the PSU, if there were several available authentication methods. 
+            This link is only contained, if the PSU is already identified or authenticated with the first relevant 
+            factor or alternatively an access token, if SCA is required and if the PSU has a choice between different 
+            authentication methods. 
+            If this link is contained, then there is also the data element 'scaMethods' contained in the response body.
+          * 'authorizeTransaction': 
+            The link to the resource, where the "Transaction Authorization Request" is sent to. 
+            This is the link to the resource which will authorize the transaction by checking the SCA authentication 
+            data within the Embedded SCA approach.
+          * 'scaStatus': 
+            The link to retrieve the scaStatus of the corresponding authorization sub-resource.
+      type: object
+      additionalProperties: 
+        $ref: "#/components/schemas/hrefType"
+      properties:
+        selectAuthenticationMethod:
+          $ref: "#/components/schemas/hrefType"
+        authorizeTransaction:
+          $ref: "#/components/schemas/hrefType"
+        scaStatus:
+          $ref: "#/components/schemas/hrefType"
+
+    _linksSelectPsuAuthenticationMethod:
+      description: |
+        A list of hyperlinks to be recognised by the TPP. The actual hyperlinks used in 
+        the response depend on the dynamical decisions of the ASPSP when processing the request.
+        
+        **Remark:** All links can be relative or full links, to be decided by the ASPSP. 
+       
+        **Remark:** This method can be applied before or after PSU identification. 
+        This leads to many possible hyperlink responses.
+        Type of links admitted in this response, (further links might be added for ASPSP defined 
+        extensions):
+        
+        - "scaRedirect": 
+          In case of an SCA Redirect Approach, the ASPSP is transmitting the link to which to 
+          redirect the PSU browser.
+        - "scaOAuth": 
+          In case of a SCA OAuth2 Approach, the ASPSP is transmitting the URI where the 
+          configuration of the Authorization Server can be retrieved. 
+          The configuration follows the OAuth 2.0 Authorization Server Metadata specification.
+        - "updatePsuIdentification": 
+          The link to the authorization or cancellation authorization sub-resource, 
+          where PSU identification data needs to be uploaded.
+        - "updatePsuAuthentication":
+          The link to the authorization or cancellation authorization sub-resource, 
+          where PSU authentication data needs to be uploaded.
+        "authorizeTransaction":
+          The link to the authorization or cancellation authorization sub-resource, 
+          where the authorization data has to be uploaded, e.g. the TOP received by SMS. 
+        "scaStatus": 
+          The link to retrieve the scaStatus of the corresponding authorization sub-resource.
+      type: object
+      additionalProperties: 
+        $ref: "#/components/schemas/hrefType"
+      properties:
+        scaRedirect:
+          $ref: "#/components/schemas/hrefType"
+        scaOAuth:
+          $ref: "#/components/schemas/hrefType"
+        updatePsuIdentification:
+          $ref: "#/components/schemas/hrefType"
+        updatePsuAuthentication:
+          $ref: "#/components/schemas/hrefType"
+        authorizeTransaction:
+          $ref: "#/components/schemas/hrefType"
+        scaStatus:
+          $ref: "#/components/schemas/hrefType"
+
+    _linksConsents:
+      description: |
+        A list of hyperlinks to be recognised by the TPP.
+        
+        Type of links admitted in this response (which might be extended by single ASPSPs as indicated in its XS2A 
+        documentation):
+          - 'scaRedirect': 
+            In case of an SCA Redirect Approach, the ASPSP is transmitting the link to which to redirect the 
+            PSU browser.
+          - 'scaOAuth': 
+            In case of an OAuth2 based Redirect Approach, the ASPSP is transmitting the link where the configuration 
+            of the OAuth2 Server is defined. 
+            The configuration follows the OAuth 2.0 Authorization Server Metadata specification. 
+          - 'startAuthorization': 
+            In case, where an explicit start of the transaction authorization is needed, 
+            but no more data needs to be updated (no authentication method to be selected, 
+            no PSU identification nor PSU authentication data to be uploaded).
+          - 'startAuthorizationWithPsuIdentification': 
+            The link to the authorization end-point, where the authorization sub-resource has to be generated 
+            while uploading the PSU identification data.
+          - 'startAuthorizationWithPsuAuthentication':
+            The link to the authorization end-point, where the authorization sub-resource has to be generated 
+            while uploading the PSU authentication data.
+          - 'startAuthorizationWithAuthenticationMethodSelection':
+            The link to the authorization end-point, where the authorization sub-resource has to be generated 
+            while selecting the authentication method. This link is contained under exactly the same conditions 
+            as the data element 'scaMethods' 
+          - 'startAuthorizationWithTransactionAuthorization':
+            The link to the authorization end-point, where the authorization sub-resource has to be generated 
+            while authorizing the transaction e.g. by uploading an OTP received by SMS.
+          - 'self': 
+            The link to the Establish Account Information Consent resource created by this request. 
+            This link can be used to retrieve the resource data. 
+          - 'status': 
+            The link to retrieve the status of the account information consent.
+          - 'scaStatus': The link to retrieve the scaStatus of the corresponding authorization sub-resource. 
+            This link is only contained, if an authorization sub-resource has been already created.
+      type: object
+      additionalProperties: 
+        $ref: "#/components/schemas/hrefType"
+      properties:
+        scaRedirect: 
+          $ref: "#/components/schemas/hrefType"
+        scaOAuth:
+          $ref: "#/components/schemas/hrefType"
+        startAuthorization:
+          $ref: "#/components/schemas/hrefType"
+        startAuthorizationWithPsuIdentification:
+          $ref: "#/components/schemas/hrefType"
+        startAuthorizationWithPsuAuthentication:
+          $ref: "#/components/schemas/hrefType"
+        startAuthorizationWithAuthenticationMethodSelection:
+          $ref: "#/components/schemas/hrefType"
+        startAuthorizationWithTransactionAuthorization: 
+          $ref: "#/components/schemas/hrefType"
+        self:
+          $ref: "#/components/schemas/hrefType"
+        status:
+          $ref: "#/components/schemas/hrefType"
+        scaStatus:
+          $ref: "#/components/schemas/hrefType"
+
+    hrefType:
+      description: Link to a resource
+      type: string
+      example: "/v1/payments/sepa-credit-transfers/1234-wertiq-983"
+
+    consentsResponse-201:
+      description: Body of the JSON response for a successful conset request.
+      type: object
+      required:
+        - consentStatus
+        - consentId
+        - _links
+      properties:
+        consentStatus:
+          $ref: "#/components/schemas/consentStatus"
+        consentId:
+          $ref: "#/components/schemas/consentId"
+        scaMethods:
+          $ref: "#/components/schemas/scaMethods"
+        chosenScaMethod:
+          $ref: "#/components/schemas/chosenScaMethod"
+        challengeData:
+          $ref: "#/components/schemas/challengeData"
+        _links:
+          $ref: "#/components/schemas/_linksConsents"
+        message:
+          description: Text to be displayed to the PSU, e.g. in a Decoupled SCA Approach.
+          type: string
+          maxLength: 512
+
+    consentStatusResponse-200:
+      description: Body of the JSON response for a successful get status request for a consent.
+      type: object
+      required:
+        - consentStatus
+      properties:
+        consentStatus:
+          $ref: "#/components/schemas/consentStatus"
+
+    consentInformationResponse-200_json:
+      description: Body of the JSON response for a successfull get consent request.
+      type: object
+      required:
+        - access
+        - recurringIndicator
+        - validUntil
+        - frequencyPerDay
+        - lastActionDate
+        - consentStatus
+      properties:
+        access:
+          $ref: "#/components/schemas/accountAccess"
+        recurringIndicator:
+          $ref: "#/components/schemas/recurringIndicator"
+        validUntil:
+          $ref: "#/components/schemas/validUntil"
+        frequencyPerDay:
+          $ref: "#/components/schemas/frequencyPerDay"
+        lastActionDate:
+          $ref: "#/components/schemas/lastActionDate"
+        consentStatus:
+          $ref: "#/components/schemas/consentStatus"
+
+    consentStatus:
+      description: |
+        This is the overall lifecycle status of the consent.
+        
+        Valid values are:
+          - 'received': The consent data have been received and are technically correct. 
+            The data is not authorized yet.
+          - 'rejected': The consent data have been rejected e.g. since no successful authorization has taken place.
+          - 'valid': The consent is accepted and valid for GET account data calls and others as specified in the consent object.
+          - 'revokedByPsu': The consent has been revoked by the PSU towards the ASPSP.
+          - 'expired': The consent expired.
+          - 'terminatedByTpp': The corresponding TPP has terminated the consent by applying the DELETE method to the consent resource.
+        
+        The ASPSP might add further codes. These codes then shall be contained in the ASPSP's documentation of the XS2A interface 
+        and has to be added to this API definition as well.
+      type: string
+      enum:
+        - "received"
+        - "rejected"
+        - "valid"
+        - "revokedByPsu"
+        - "expired"
+        - "terminatedByTpp"
+
+    lastActionDate:
+      description: |
+        This date is containing the date of the last action on the consent object either through 
+        the XS2A interface or the PSU/ASPSP interface having an impact on the status.
+      type: string
+      format: date
+      example: "2018-07-01"
+
+    #####################################################
+    # Tpp-Messages
+    #####################################################
+
+    tppMessageCategory:
+      description: Category of the TPP message category
+      type: string
+      enum:
+        - "ERROR"
+        - "WARNING"
+
+    tppMessageText:
+      description: Additional explaining text to the TPP.
+      type: string
+      maxLength: 512
+
+    tppMessageGeneric:
+      description: One Message to the TPP on operational issues.
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+           $ref: "#/components/schemas/tppMessageCategory"
+        code:
+          anyOf:
+            - $ref: "#/components/schemas/messageCodeTextUnspecific"
+            - $ref: "#/components/schemas/messageCodeTextPisSpecific"
+            - $ref: "#/components/schemas/messageCodeTextAisSpecific"
+            - $ref: "#/components/schemas/messageCodeTextPiisSpecific"
+        path:
+          type: string
+        text:
+          $ref: "#/components/schemas/tppMessageText"
+
+    tppMessage_GENERIC-FORMAT_ERROR_400:
+      description: |
+        Format of certain request fields are not matching the XS2A requirements.
+        An explicit path to the corresponding field might be added in the return message.
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+           $ref: "#/components/schemas/tppMessageCategory"
+        code:
+          type: string
+          enum: 
+            - "FORMAT_ERROR"
+        path:
+          type: string
+        text:
+          $ref: "#/components/schemas/tppMessageText"
+
+    tppMessage_GENERIC-PARAMETER_NOT_SUPPORTED_400:
+      description: |
+        The parameter is not supported by the API provider.
+        This code should only be used for parameters that are described as
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+           $ref: "#/components/schemas/tppMessageCategory"
+        code:
+          type: string
+          enum: 
+            - "PARAMETER_NOT_SUPPORTED"
+        path:
+          type: string
+        text:
+          $ref: "#/components/schemas/tppMessageText"
+
+    tppMessage_GENERIC-RESOURCE_UNKNOWN_404_403_400:
+      description: |
+        The addressed resource is unknown relative to the TPP.
+          - 404 (if account-id in path)
+          - 403 (if other resource in path)
+          - 400 (if payload)
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+           $ref: "#/components/schemas/tppMessageCategory"
+        code:
+          type: string
+          enum: 
+            - "RESOURCE_UNKNOWN"
+        path:
+          type: string
+        text:
+          $ref: "#/components/schemas/tppMessageText"
+
+    tppMessage_GENERIC-RESOURCE_EXPIRED_403_400:
+      description: |
+        The addressed resource is associated with the TPP but has expired, not addressable anymore.
+          - 403 (if path)
+          - 400 (if payload)
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+           $ref: "#/components/schemas/tppMessageCategory"
+        code:
+          type: string
+          enum: 
+            - "RESOURCE_EXPIRED"
+        path:
+          type: string
+        text:
+          $ref: "#/components/schemas/tppMessageText"
+
+    tppMessage_GENERIC-TIMESTAMP_INVALID_400:
+      description: Timestamp not in accepted time period.
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+           $ref: "#/components/schemas/tppMessageCategory"
+        code:
+          type: string
+          enum: 
+            - "TIMESTAMP_INVALID"
+        path:
+          type: string
+        text:
+          $ref: "#/components/schemas/tppMessageText"
+
+    tppMessage_GENERIC-PERIOD_INVALID_400:
+      description: Requested time period out of bound.
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+           $ref: "#/components/schemas/tppMessageCategory"
+        code:
+          type: string
+          enum: 
+            - "PERIOD_INVALID"
+        path:
+          type: string
+        text:
+          $ref: "#/components/schemas/tppMessageText"
+
+    tppMessage_GENERIC-SCA_METHOD_UNKNOWN_400:
+      description: |
+        Addressed SCA method in the Authentication Method Select Request is unknown
+        or cannot be matched by the ASPSP with the PSU.
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+           $ref: "#/components/schemas/tppMessageCategory"
+        code:
+          type: string
+          enum: 
+            - "SCA_METHOD_UNKNOWN"
+        path:
+          type: string
+        text:
+          $ref: "#/components/schemas/tppMessageText"
+
+    tppMessage_PIIS-CARD_INVALID_400:
+      description: |
+        Addressed card number is unknown to the ASPSP or not associated to the PSU.
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+           $ref: "#/components/schemas/tppMessageCategory"
+        code:
+          type: string
+          enum: 
+            - "CARD_INVALID"
+        path:
+          type: string
+        text:
+          $ref: "#/components/schemas/tppMessageText"
+
+    tppMessage_PIIS-NO_PIIS_ACTIVATION_400:
+      description: The PSU has not activated the addressed account for the usage of the PIIS associated with the TPP.
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+           $ref: "#/components/schemas/tppMessageCategory"
+        code:
+          type: string
+          enum: 
+            - "NO_PIIS_ACTIVATION"
+        path:
+          type: string
+        text:
+          $ref: "#/components/schemas/tppMessageText"
+
+    tppMessage_AIS-SESSIONS_NOT_SUPPORTED_400:
+      description: |
+        The combined service flag may not be used with this ASPSP.
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+           $ref: "#/components/schemas/tppMessageCategory"
+        code:
+          type: string
+          enum: 
+            - "SESSIONS_NOT_SUPPORTED"
+        path:
+          type: string
+        text:
+          $ref: "#/components/schemas/tppMessageText"
+
+    tppMessage_PIS-PAYMENT_FAILED_400:
+      description: |
+        The payment initiation POST request failed during the initial process.
+        Additional information may be provided by the ASPSP.
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+           $ref: "#/components/schemas/tppMessageCategory"
+        code:
+          type: string
+          enum: 
+            - "PAYMENT_FAILED"
+        path:
+          type: string
+        text:
+          $ref: "#/components/schemas/tppMessageText"
+
+    tppMessage_PIS-EXECUTION_DATE_INVALID_400:
+      description: |
+        The requested execution date is not a valid execution date for the ASPSP.
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+           $ref: "#/components/schemas/tppMessageCategory"
+        code:
+          type: string
+          enum: 
+            - "EXECUTION_DATE_INVALID"
+        path:
+          type: string
+        text:
+          $ref: "#/components/schemas/tppMessageText"
+
+    tppMessage_GENERIC-CERTIFICATE_INVALID_401:
+      description: |
+        The contents of the signature/corporate seal certificate are not matching PSD2 general PSD2 
+        or attribute requirements.
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+           $ref: "#/components/schemas/tppMessageCategory"
+        code:
+          type: string
+          enum: 
+            - "CERTIFICATE_INVALID"
+        path:
+          type: string
+        text:
+          $ref: "#/components/schemas/tppMessageText"
+
+    tppMessage_GENERIC-CERTIFICATE_EXPIRED_401:
+      description: Signature/corporate seal certificate is expired.
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+           $ref: "#/components/schemas/tppMessageCategory"
+        code:
+          type: string
+          enum: 
+            - "CERTIFICATE_EXPIRED"
+        path:
+          type: string
+        text:
+          $ref: "#/components/schemas/tppMessageText"
+
+    tppMessage_GENERIC-CERTIFICATE_BLOCKED_401:
+      description: |
+        Signature/corporate seal certificate has been blocked by the ASPSP.
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+           $ref: "#/components/schemas/tppMessageCategory"
+        code:
+          type: string
+          enum: 
+            - "CERTIFICATE_BLOCKED"
+        path:
+          type: string
+        text:
+          $ref: "#/components/schemas/tppMessageText"
+
+    tppMessage_GENERIC-CERTIFICATE_REVOKED_401:
+      description: |
+        Signature/corporate seal certificate has been revoked by QSTP.
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+           $ref: "#/components/schemas/tppMessageCategory"
+        code:
+          type: string
+          enum: 
+            - "CERTIFICATE_REVOKED"
+        path:
+          type: string
+        text:
+          $ref: "#/components/schemas/tppMessageText"
+
+    tppMessage_GENERIC-CERTIFICATE_MISSING_401:
+      description: |
+        Signature/corporate seal certificate was not available in the request but is mandated for the corresponding.
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+           $ref: "#/components/schemas/tppMessageCategory"
+        code:
+          type: string
+          enum: 
+            - "CERTIFICATE_MISSING"
+        path:
+          type: string
+        text:
+          $ref: "#/components/schemas/tppMessageText"
+
+    tppMessage_GENERIC-SIGNATURE_INVALID_401:
+      description: Application layer eIDAS Signature for TPP authentication is not correct.
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+           $ref: "#/components/schemas/tppMessageCategory"
+        code:
+          type: string
+          enum: 
+            - "SIGNATURE_INVALID"
+        path:
+          type: string
+        text:
+          $ref: "#/components/schemas/tppMessageText"
+
+    tppMessage_GENERIC-SIGNATURE_MISSING_401:
+      description: |
+        Application layer eIDAS Signature for TPP authentication is mandated by the ASPSP but is missing.
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+           $ref: "#/components/schemas/tppMessageCategory"
+        code:
+          type: string
+          enum: 
+            - "SIGNATURE_MISSING"
+        path:
+          type: string
+        text:
+          $ref: "#/components/schemas/tppMessageText"
+
+    tppMessage_GENERIC-CONSENT_INVALID_401:
+      description: |
+        The consent was created by this TPP but is not valid for the addressed service/resource.
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+           $ref: "#/components/schemas/tppMessageCategory"
+        code:
+          type: string
+          enum: 
+            - "CONSENT_INVALID"
+        path:
+          type: string
+        text:
+          $ref: "#/components/schemas/tppMessageText"
+
+    tppMessage_GENERIC-CONSENT_EXPIRED_401:
+      description: The consent was created by this TPP but has expired and needs to be renewed.
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+           $ref: "#/components/schemas/tppMessageCategory"
+        code:
+          type: string
+          enum: 
+            - "CONSENT_EXPIRED"
+        path:
+          type: string
+        text:
+          $ref: "#/components/schemas/tppMessageText"
+
+    tppMessage_GENERIC-TOKEN_UNKNOWN_401:
+      description: The OAuth2 token cannot be matched by the ASPSP relative to the TPP.
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+           $ref: "#/components/schemas/tppMessageCategory"
+        code:
+          type: string
+          enum: 
+            - "TOKEN_UNKNOWN"
+        path:
+          type: string
+        text:
+          $ref: "#/components/schemas/tppMessageText"
+
+    tppMessage_GENERIC-TOKEN_INVALID_401:
+      description: The OAuth2 token is associated to the TPP but is not valid for the addressed service/resource.
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+           $ref: "#/components/schemas/tppMessageCategory"
+        code:
+          type: string
+          enum: 
+            - "TOKEN_INVALID"
+        path:
+          type: string
+        text:
+          $ref: "#/components/schemas/tppMessageText"
+
+    tppMessage_GENERIC-TOKEN_EXPIRED_401:
+      description: The OAuth2 token is associated to the TPP but has expired and needs to be renewed.
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+           $ref: "#/components/schemas/tppMessageCategory"
+        code:
+          type: string
+          enum: 
+            - "TOKEN_EXPIRED"
+        path:
+          type: string
+        text:
+          $ref: "#/components/schemas/tppMessageText"
+
+    tppMessage_GENERIC-CORPORATE_ID_INVALID_401:
+      description: The PSU-Corporate-ID cannot be matched by the addressed ASPSP.
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+           $ref: "#/components/schemas/tppMessageCategory"
+        code:
+          type: string
+          enum: 
+            - "CORPORATE_ID_INVALID"
+        path:
+          type: string
+        text:
+          $ref: "#/components/schemas/tppMessageText"
+
+    tppMessage_GENERIC-PSU_CREDENTIALS_INVALID_401:
+      description: |
+        The PSU-ID cannot be matched by the addressed ASPSP or is blocked, or a password resp.
+        OTP was not correct.
+        Additional information might be added.
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+           $ref: "#/components/schemas/tppMessageCategory"
+        code:
+          type: string
+          enum: 
+            - "PSU_CREDENTIALS_INVALID"
+        path:
+          type: string
+        text:
+          $ref: "#/components/schemas/tppMessageText"
+
+    tppMessage_AIS-CONSENT_INVALID_401:
+      description: |
+        The consent definition is not complete or invalid.
+        In case of being not complete, the bank is not supporting a completion of the consent towards the PSU.
+        Additional information will be provided.
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+           $ref: "#/components/schemas/tppMessageCategory"
+        code:
+          type: string
+          enum: 
+            - "CONSENT_INVALID"
+        path:
+          type: string
+        text:
+          $ref: "#/components/schemas/tppMessageText"
+
+    tppMessage_PIS-REQUIRED_KID_MISSING_401:
+      description: |
+        The payment initiation has failed due to a missing KID.
+        This is a specific message code for the Norwegian market,
+        where ASPSP can require the payer to transmit the KID.
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+           $ref: "#/components/schemas/tppMessageCategory"
+        code:
+          type: string
+          enum: 
+            - "REQUIRED_KID_MISSING"
+        path:
+          type: string
+        text:
+          $ref: "#/components/schemas/tppMessageText"
+
+    tppMessage_PIS-PRODUCT_INVALID_403:
+      description: The addressed payment product is not available for the PSU.
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+           $ref: "#/components/schemas/tppMessageCategory"
+        code:
+          type: string
+          enum: 
+            - "PRODUCT_INVALID"
+        path:
+          type: string
+        text:
+          $ref: "#/components/schemas/tppMessageText"
+
+    tppMessage_GENERIC-SERVICE_BLOCKED_403:
+      description: |
+        This service is not reachable for the addressed PSU due to a channel independent blocking by the ASPSP.
+        Additional information might be given by the ASPSP.
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+           $ref: "#/components/schemas/tppMessageCategory"
+        code:
+          type: string
+          enum: 
+            - "SERVICE_BLOCKED"
+        path:
+          type: string
+        text:
+          $ref: "#/components/schemas/tppMessageText"
+
+    tppMessage_GENERIC-CONSENT_UNKNOWN_403_400:
+      description: |
+        The Consent-ID cannot be matched by the ASPSP relative to the TPP.
+          - 403 (if path)
+          - 400 (if payload)
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+           $ref: "#/components/schemas/tppMessageCategory"
+        code:
+          type: string
+          enum: 
+            - "CONSENT_UNKNOWN"
+        path:
+          type: string
+        text:
+          $ref: "#/components/schemas/tppMessageText"
+
+    tppMessage_PIS-PRODUCT_UNKNOWN_404:
+      description: |
+        The addressed payment product is not supported by the ASPSP.
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+           $ref: "#/components/schemas/tppMessageCategory"
+        code:
+          type: string
+          enum: 
+            - "PRODUCT_UNKNOWN"
+        path:
+          type: string
+        text:
+          $ref: "#/components/schemas/tppMessageText"
+
+    tppMessage_GENERIC-SERVICE_INVALID_400_405: 
+      description: |
+        Message to the TPP: 
+        The addressed service is not valid for the addressed resources or the submitted data.
+
+          - 400 (if payload)
+          - 405 (if HTTP method)
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+           $ref: "#/components/schemas/tppMessageCategory"
+        code:
+          type: string
+          enum: 
+            - "SERVICE_INVALID"
+        path:
+          type: string
+        text:
+          $ref: "#/components/schemas/tppMessageText"
+
+    tppMessage_AIS-REQUESTED_FORMATS_INVALID_406: 
+      description: |
+        Message to the TPP: 
+        The requested formats in the Accept header entry are not matching the formats offered by the ASPSP.
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+           $ref: "#/components/schemas/tppMessageCategory"
+        code:
+          type: string
+          enum: 
+            - "REQUESTED_FORMATS_INVALID"
+        path:
+          type: string
+        text:
+          $ref: "#/components/schemas/tppMessageText"
+
+    tppMessage_GENERIC-CONFLICT_409:
+      description: |
+        Message to the TPP: 
+        The request could not be completed due to a conflict with the current state of the resource.
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+           $ref: "#/components/schemas/tppMessageCategory"
+        code:
+          type: string
+          enum: 
+            - "CONFLICT"
+        path:
+          type: string
+        text:
+          $ref: "#/components/schemas/tppMessageText"
+
+    tppMessage_AIS-ACCESS_EXCEEDED_429: 
+      description: |
+        Message to the TPP: 
+        The access on the account has been exceeding the consented multiplicity per day.
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+           $ref: "#/components/schemas/tppMessageCategory"
+        code:
+          type: string
+          enum: 
+            - "ACCESS_EXCEEDED"
+        path:
+          type: string
+        text:
+          $ref: "#/components/schemas/tppMessageText"
+
+    tppMessages:
+      description: Messages to the TPP on operational issues.
+      type: array
+      items:
+        $ref: "#/components/schemas/tppMessageGeneric"
+      example:
+        [{
+          "category": "ERROR",
+          "code": "TOKEN_INVALID",
+          "text": "additional text information of the ASPSP up to 512 characters"
+        }]
+
+    tppMessages400: 
+      description: Messages to the TPP on operational issues.
+      type: array
+      items:
+        anyOf:
+          - $ref: "#/components/schemas/tppMessage_GENERIC-FORMAT_ERROR_400"
+          - $ref: "#/components/schemas/tppMessage_GENERIC-PARAMETER_NOT_SUPPORTED_400"
+          - $ref: "#/components/schemas/tppMessage_GENERIC-SERVICE_INVALID_400_405"  
+          - $ref: "#/components/schemas/tppMessage_GENERIC-RESOURCE_UNKNOWN_404_403_400"
+          - $ref: "#/components/schemas/tppMessage_GENERIC-RESOURCE_EXPIRED_403_400"
+          - $ref: "#/components/schemas/tppMessage_GENERIC-TIMESTAMP_INVALID_400"
+          - $ref: "#/components/schemas/tppMessage_GENERIC-PERIOD_INVALID_400"
+          - $ref: "#/components/schemas/tppMessage_GENERIC-SCA_METHOD_UNKNOWN_400"
+          - $ref: "#/components/schemas/tppMessage_GENERIC-CONSENT_UNKNOWN_403_400"
+          - $ref: "#/components/schemas/tppMessage_PIIS-CARD_INVALID_400"
+          - $ref: "#/components/schemas/tppMessage_PIIS-NO_PIIS_ACTIVATION_400"
+          - $ref: "#/components/schemas/tppMessage_AIS-SESSIONS_NOT_SUPPORTED_400"
+          - $ref: "#/components/schemas/tppMessage_PIS-PAYMENT_FAILED_400"
+          - $ref: "#/components/schemas/tppMessage_PIS-EXECUTION_DATE_INVALID_400"
+      example:
+        [{
+          "category": "ERROR",
+          "code": "FORMAT_ERROR",
+          "text": "additional text information of the ASPSP up to 512 characters"
+        },{
+          "category": "ERROR",
+          "code": "FORMAT_ERROR",
+          "text": "Further additional text information of the ASPSP up to 512 characters"
+        }
+        ]
+
+    tppMessages401: 
+      description: Messages with HTTP error code 401 to the TPP on operational issues.
+      type: array
+      items:
+        anyOf:
+          - $ref: "#/components/schemas/tppMessage_GENERIC-CERTIFICATE_INVALID_401"
+          - $ref: "#/components/schemas/tppMessage_GENERIC-CERTIFICATE_EXPIRED_401"
+          - $ref: "#/components/schemas/tppMessage_GENERIC-CERTIFICATE_BLOCKED_401"
+          - $ref: "#/components/schemas/tppMessage_GENERIC-CERTIFICATE_REVOKED_401"
+          - $ref: "#/components/schemas/tppMessage_GENERIC-CERTIFICATE_MISSING_401"
+          - $ref: "#/components/schemas/tppMessage_GENERIC-SIGNATURE_INVALID_401"
+          - $ref: "#/components/schemas/tppMessage_GENERIC-SIGNATURE_MISSING_401"
+          - $ref: "#/components/schemas/tppMessage_GENERIC-CONSENT_INVALID_401"
+          - $ref: "#/components/schemas/tppMessage_GENERIC-CONSENT_EXPIRED_401"
+          - $ref: "#/components/schemas/tppMessage_GENERIC-TOKEN_UNKNOWN_401"
+          - $ref: "#/components/schemas/tppMessage_GENERIC-TOKEN_INVALID_401"
+          - $ref: "#/components/schemas/tppMessage_GENERIC-TOKEN_EXPIRED_401"
+          - $ref: "#/components/schemas/tppMessage_GENERIC-CORPORATE_ID_INVALID_401"
+          - $ref: "#/components/schemas/tppMessage_GENERIC-PSU_CREDENTIALS_INVALID_401"
+          - $ref: "#/components/schemas/tppMessage_AIS-CONSENT_INVALID_401"
+          - $ref: "#/components/schemas/tppMessage_PIS-REQUIRED_KID_MISSING_401"
+      example:
+        [{
+          "category": "ERROR",
+          "code": "CERTIFICATE_INVALID",
+          "text": "additional text information of the ASPSP up to 512 characters"
+        }]
+
+    tppMessages403: 
+      description: Messages with HTTP error code 403 to the TPP on operational issues.
+      type: array
+      items:
+        anyOf:
+          - $ref: "#/components/schemas/tppMessage_GENERIC-SERVICE_BLOCKED_403"
+          - $ref: "#/components/schemas/tppMessage_GENERIC-CONSENT_UNKNOWN_403_400"
+          - $ref: "#/components/schemas/tppMessage_GENERIC-RESOURCE_UNKNOWN_404_403_400"
+          - $ref: "#/components/schemas/tppMessage_GENERIC-RESOURCE_EXPIRED_403_400"
+          - $ref: "#/components/schemas/tppMessage_PIS-PRODUCT_INVALID_403"
+      example:
+        [{
+        "category": "ERROR",
+        "code": "SERVICE_BLOCKED",
+        "text": "additional text information of the ASPSP up to 512 characters"
+        }]
+
+    tppMessages404: 
+      description: Messages with HTTP error code 404 to the TPP on operational issues.
+      type: array
+      items:
+        anyOf:
+          - $ref: "#/components/schemas/tppMessage_PIS-PRODUCT_UNKNOWN_404"
+          - $ref: "#/components/schemas/tppMessage_GENERIC-RESOURCE_UNKNOWN_404_403_400"
+      example:
+        [{
+          "category": "ERROR",
+          "code": "PRODUCT_UNKNOWN",
+          "text": "additional text information of the ASPSP up to 512 characters"
+        }]
+
+    tppMessages405:
+      description: Messages with HTTP error code 405 to the TPP on operational issues.
+      type: array
+      items:
+        anyOf:
+          - $ref: "#/components/schemas/tppMessage_GENERIC-SERVICE_INVALID_400_405"
+      example:
+        [{
+          "category": "ERROR",
+          "code": "SERVICE_INVALID",
+          "text": "additional text information of the ASPSP up to 512 characters"
+        }]
+
+
+    tppMessages406:
+      description: Messages with HTTP error code 406 to the TPP on operational issues.
+      type: array
+      items:
+        anyOf:
+          - $ref: "#/components/schemas/tppMessage_AIS-REQUESTED_FORMATS_INVALID_406"
+      example:
+        [{
+          "category": "ERROR",
+          "code": "REQUESTED_FORMATS_INVALID",
+          "text": "additional text information of the ASPSP up to 512 characters"
+        }]
+
+    tppMessages409:
+      description: Messages with HTTP error code 409 to the TPP on operational issues.
+      type: array
+      items:
+        anyOf:
+          - $ref: "#/components/schemas/tppMessage_GENERIC-CONFLICT_409"
+      example:
+        [{
+          "category": "ERROR",
+          "code": "CONFLICT",
+          "text": "additional text information of the ASPSP up to 512 characters"
+        }]
+
+    tppMessages429: 
+      description: Messages with HTTP error code 429 to the TPP on operational issues.
+      type: array
+      items:
+        anyOf: 
+          - $ref: "#/components/schemas/tppMessage_AIS-ACCESS_EXCEEDED_429"
+      example:
+        [{
+          "category": "ERROR",
+          "code": "ACCESS_EXCEEDED",
+          "text": "additional text information of the ASPSP up to 512 characters"
+        }]
+
+    messageCodeTextUnspecific:
+      type: string
+      enum:
+        - "CERTIFICATE_INVALID"
+        - "CERTIFICATE_EXPIRED"
+        - "CERTIFICATE_BLOCKED"
+        - "CERTIFICATE_REVOKED"
+        - "CERTIFICATE_MISSING"
+        - "SIGNATURE_INVALID"
+        - "SIGNATURE_MISSING"
+        - "FORMAT_ERROR"
+        - "PARAMETER_NOT_SUPPORTED"
+        - "PSU_CREDENTIALS_INVALID"
+        - "SERVICE_INVALID"
+        - "SERVICE_BLOCKED"
+        - "CORPORATE_ID_INVALID"
+        - "CONSENT_UNKNOWN"
+        - "CONSENT_INVALID"
+        - "CONSENT_EXPIRED"
+        - "TOKEN_UNKNOWN"
+        - "TOKEN_INVALID"
+        - "TOKEN_EXPIRED"
+        - "RESOURCE_UNKNOWN"
+        - "RESOURCE_EXPIRED"
+        - "TIMESTAMP_INVALID"
+        - "PERIOD_INVALID"
+        - "SCA_METHOD_UNKNOWN"
+        - "CONFLICT"
+
+    messageCodeTextPisSpecific:
+      type: string
+      enum:
+        - "PRODUCT_INVALID"
+        - "PRODUCT_UNKNOWN"
+        - "PAYMENT_FAILED"
+        - "REQUIRED_KID_MISSING"
+        - "EXECUTION_DATE_INVALID"
+
+    messageCodeTextAisSpecific:
+      type: string
+      enum:
+        - "CONSENT_INVALID"
+        - "SESSIONS_NOT_SUPPORTED"
+        - "ACCESS_EXCEEDED"
+        - "REQUESTED_FORMATS_INVALID"
+
+    messageCodeTextPiisSpecific:
+      type: string
+      enum:
+        - "CARD_INVALID"
+        - "NO_PIIS_ACTIVATION"
+
+  parameters:
+    authorizationId:
+      name: authorizationId
+      in: path
+      description: Resource identification of the related SCA.
+      required: true
+      schema:
+        $ref: "#/components/schemas/authorizationId"
+
+    consentId_PATH:
+      name: consentId
+      in: path
+      description: |
+        ID of the corresponding consent object as returned by an Account Information Consent Request.
+      required: true
+      schema:
+        $ref: "#/components/schemas/consentId"
+
+    X-Request-ID:
+      name: X-Request-ID
+      in: header
+      description: ID of the request, unique to the call, as determined by the initiating party.
+      required: true
+      example: "99391c7e-ad88-49ec-a2ad-99ddcb1f7721"
+      schema:
+        type: string
+        format: uuid
+
+    X-BicFi:
+      name: X-BicFi
+      in: header
+      description: BICFI
+      required: true
+      schema:
+        type: string
+        pattern: "[A-Z]{6,6}[A-Z2-9][A-NP-Z0-9]([A-Z0-9]{3,3}){0,1}"
+        example: "AAAADEBBXXX"
+
+    Digest:
+      name: Digest
+      in: header
+      description: Is contained if and only if the "Signature" element is contained in the header of the request.
+      schema:
+        type: string
+      required: false # conditional
+      example: "SHA-256=hl1/Eps8BEQW58FJhDApwJXjGY4nr1ArGDHIT25vq6A="
+
+    Signature:
+      name: Signature
+      in: header
+      description: |
+        A signature of the request by the TPP on application level. This might be mandated by ASPSP.
+      schema:
+        type: string
+      required: false # conditional
+      example: >
+        keyId="SN=9FA1,CA=CN=D-TRUST%20CA%202-1%202015,O=D-Trust%20GmbH,C=DE",algorithm="rsa-sha256",
+        headers="Digest X-Request-ID PSU-ID TPP-Redirect-URI Date",
+        signature="Base64(RSA-SHA256(signing string))"
+
+    TPP-Signature-Certificate:
+      name: TPP-Signature-Certificate
+      in: header
+      description: |
+        The certificate used for signing the request, in base64 encoding. 
+        Must be contained if a signature is contained.
+      schema:
+        type: string
+        format: byte
+      required: false # conditional
+
+    TPP-Redirect-Preferred:
+      name: TPP-Redirect-Preferred
+      in: header
+      description: |
+        If it equals "true", the TPP prefers a redirect over an embedded SCA approach.
+        If it equals "false", the TPP prefers not to be redirected for SCA. The ASPSP will then choose between the Embedded or the Decoupled
+        SCA approach, depending on the choice of the SCA procedure by the TPP/PSU.
+        If the parameter is not used, the ASPSP will choose the SCA approach to be applied depending on the SCA method chosen by the
+        TPP/PSU.
+      schema:
+        type: boolean
+      required: false
+
+    TPP-Redirect-URI:
+      name: TPP-Redirect-URI
+      in: header
+      description: |
+        URI of the TPP, where the transaction flow shall be redirected to after a Redirect.
+        
+        Mandated for the Redirect SCA Approach (including OAuth2 SCA approach), specifically 
+        when TPP-Redirect-Preferred equals "true".
+        It is recommended to always use this header field.
+        
+        **Remark for Future:** 
+        This field might be changed to mandatory in the next version of the specification.
+      schema:
+        type: string
+        format: uri
+      required: false # conditional
+
+    TPP-Nok-Redirect-URI:
+      name: TPP-Nok-Redirect-URI
+      in: header
+      description: |
+        If this URI is contained, the TPP is asking to redirect the transaction flow to this address instead of the TPP-Redirect-URI in case
+        of a negative result of the redirect SCA method. This might be ignored by the ASPSP.
+      schema:
+        type: string
+        format: uri
+      required: false
+
+    TPP-Explicit-Authorization-Preferred:
+      name: TPP-Explicit-Authorization-Preferred
+      in: header
+      description: |
+        If it equals "true", the TPP prefers to start the authorization process separately, 
+        e.g. because of the usage of a signing basket. 
+        This preference might be ignored by the ASPSP, if a signing basket is not supported as functionality.
+        
+        If it equals "false" or if the parameter is not used, there is no preference of the TPP. 
+        This especially indicates that the TPP assumes a direct authorization of the transaction in the next step, 
+        without using a signing basket.
+      schema:
+        type: boolean
+      required: false
+
+    PSU-ID: 
+      name: PSU-ID
+      in: header
+      description: |
+        Client ID of the PSU in the ASPSP client interface. Might be mandated in the ASPSP's documentation.
+        Is not contained if an OAuth2 based authentication was performed in a pre-step or an OAuth2 based SCA was performed in an preceeding
+        AIS service in the same session.
+      schema:
+        type: string
+      required: false
+      example: "PSU-1234"
+
+    PSU-ID-Type: 
+      name: PSU-ID-Type
+      in: header
+      description: |
+        Type of the PSU-ID, needed in scenarios where PSUs have several PSU-IDs as access possibility.
+      schema:
+        type: string
+      required: false
+
+    PSU-Corporate-ID: 
+      name: PSU-Corporate-ID
+      in: header
+      description: |
+        Might be mandated in the ASPSP's documentation. Only used in a corporate context.
+      schema:
+        type: string
+      required: false
+
+    PSU-Corporate-ID-Type: 
+      name: PSU-Corporate-ID-Type
+      in: header
+      description: |
+        Might be mandated in the ASPSP's documentation. Only used in a corporate context.
+      schema:
+        type: string
+      required: false
+
+    PSU-IP-Address_mandatory:
+      name: PSU-IP-Address
+      in: header
+      description: |
+        The forwarded IP Address header field consists of the corresponding http request IP Address field between PSU and TPP.
+      schema:
+        type: string
+        format: ipv4
+      required: true
+      example: 192.168.8.78
+
+    PSU-IP-Address_optional:
+      name: PSU-IP-Address
+      in: header
+      description: |
+        The forwarded IP Address header field consists of the corresponding http request IP Address field between PSU and TPP.
+      schema:
+        type: string
+        format: ipv4
+      required: false
+      example: 192.168.8.78
+
+    PSU-IP-Port:
+      name: PSU-IP-Port
+      in: header
+      description: |
+        The forwarded IP Port header field consists of the corresponding HTTP request IP Port field between PSU and TPP, if available.
+      schema:
+        oneOf:
+          - type: integer
+          - type: string
+      required: false
+      example: "1234"
+
+    PSU-Accept:
+      name: PSU-Accept
+      in: header
+      description: |
+        The forwarded IP Accept header fields consist of the corresponding HTTP request Accept header fields between PSU and TPP, if available.
+      schema:
+        type: string
+      required: false
+
+    PSU-Accept-Charset:
+      name: PSU-Accept-Charset
+      in: header
+      description: |
+        The forwarded IP Accept header fields consist of the corresponding HTTP request Accept header fields between PSU and TPP, if available.
+      schema:
+        type: string
+      required: false
+
+    PSU-Accept-Encoding:
+      name: PSU-Accept-Encoding
+      in: header
+      description: |
+        The forwarded IP Accept header fields consist of the corresponding HTTP request Accept header fields between PSU and TPP, if available.
+      schema:
+        type: string
+      required: false
+
+    PSU-Accept-Language:
+      name: PSU-Accept-Language
+      in: header
+      description: |
+        The forwarded IP Accept header fields consist of the corresponding HTTP request Accept header fields between PSU and TPP, if available.
+      schema:
+        type: string
+      required: false
+
+    PSU-User-Agent:
+      name: PSU-User-Agent
+      in: header
+      description: |
+        The forwarded Agent header field of the HTTP request between PSU and TPP, if available.
+      schema:
+        type: string
+      required: false
+
+    PSU-Http-Method:
+      name: PSU-Http-Method
+      in: header
+      description: |
+        HTTP method used at the PSU ? TPP interface, if available.
+        Valid values are:
+        * GET
+        * POST
+        * PUT
+        * PATCH
+        * DELETE
+      schema:
+        type: string
+        enum:
+          - "GET"
+          - "POST"
+          - "PUT"
+          - "PATCH"
+          - "DELETE"
+      required: false
+
+    PSU-Device-ID:
+      name: PSU-Device-ID
+      in: header
+      description: |
+        UUID (Universally Unique Identifier) for a device, which is used by the PSU, if available.
+        UUID identifies either a device or a device dependant application installation.
+        In case of an installation identification this ID need to be unaltered until removal from device.
+      schema:
+        type: string
+        format: uuid
+      required: false
+      example: "99435c7e-ad88-49ec-a2ad-99ddcb1f5555"
+
+    PSU-Geo-Location:
+      name: PSU-Geo-Location
+      in: header
+      description: |
+        The forwarded Geo Location of the corresponding http request between PSU and TPP if available.
+      schema:
+        type: string
+        pattern: '(GEO:)[0-9]{1,3}\.([-])?[0-9]{6}\,([-])?[0-9]{1,3}\.[0-9]{6}'
+      required: false
+      example: GEO:52.506931,13.144558
+
+  requestBodies:
+    consents:
+      description: |
+        Requestbody for a consents request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/consents"
+          examples:
+            "Consent Request on Dedicated Accounts": 
+              $ref: "#/components/examples/consentsExample_DedicatedAccounts"
+            "Consent on Account List of Available Accounts":
+              $ref: "#/components/examples/consentsExample_AccountList"
+            "Consent Request on Account List or without Indication of dedicated Accounts":
+              $ref: "#/components/examples/consentsExample_without_Accounts"
+
+  headers:
+    #####################################################
+    # Reusable Response Header Elements
+    #####################################################
+
+    X-Request-ID:
+      description: ID of the request, unique to the call, as determined by the initiating party.
+      required: true
+      example: "99391c7e-ad88-49ec-a2ad-99ddcb1f7721"
+      schema:
+        type: string
+        format: uuid
+
+    ASPSP-SCA-Approach:
+      description: |
+        This data element must be contained, if the SCA Approach is already fixed.
+        Possible values are
+          * EMBEDDED
+          * DECOUPLED
+          * REDIRECT
+        The OAuth SCA approach will be subsumed by REDIRECT.
+      schema:
+        type: string
+        enum:
+          - "EMBEDDED"
+          - "DECOUPLED"
+          - "REDIRECT"
+        example: "EMBEDDED"
+      required: false
+
+    Location:
+      description: |
+        Location of the created resource.
+      schema:
+        type: string
+        format: url
+      required: false
+
+  responses:
+    OK_200_Authorizations:
+      description: OK
+      headers:
+        X-Request-ID:
+          $ref: "#/components/headers/X-Request-ID"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/authorizations"
+          examples:
+            Example:
+              $ref: "#/components/examples/authorizationListExample"
+
+    OK_200_ScaStatus:
+      description: OK
+      headers: 
+        X-Request-ID:
+          $ref: "#/components/headers/X-Request-ID"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/scaStatusResponse"
+
+    CREATED_201_StartScaProcess:
+      description: Created
+      headers:
+        X-Request-ID:
+          $ref: "#/components/headers/X-Request-ID"
+        ASPSP-SCA-Approach:
+          $ref: "#/components/headers/ASPSP-SCA-Approach"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/startScaprocessResponse"
+          examples: 
+            "Example 1: payments - Decoupled Approach": 
+               $ref: "#/components/examples/startScaProcessResponseExample1"
+
+    CREATED_201_Consents:
+      description: Created
+      headers:
+        Location:
+          $ref: "#/components/headers/Location"
+        X-Request-ID:
+          $ref: "#/components/headers/X-Request-ID"
+        ASPSP-SCA-Approach:
+          $ref: "#/components/headers/ASPSP-SCA-Approach"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/consentsResponse-201"
+          examples: 
+            "Response in case of a redirect":
+              $ref: "#/components/examples/consentResponseExample1a_Redirect"
+            "Response in case of a redirect with a dedicated start of the authorization process":
+              $ref: "#/components/examples/consentResponseExample1b_Redirect"
+            "Response in case of the OAuth2 approach with an implicit generated authorization resource": 
+              $ref: "#/components/examples/consentResponseExample2_OAuth2"
+            "Response in case of the decoupled approach": 
+              $ref: "#/components/examples/consentResponseExample3_Decoupled"
+            "Response in case of the embedded approach": 
+              $ref: "#/components/examples/consentResponseExample4_Embedded"
+
+    OK_200_ConsentInformation:
+      description: OK
+      headers:
+        X-Request-ID:
+          $ref: "#/components/headers/X-Request-ID"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/consentInformationResponse-200_json"
+          examples:
+            Example:
+              $ref: "#/components/examples/consentsInformationResponseExample"
+
+    OK_200_ConsentsStatus: 
+      description: OK
+      headers:
+        X-Request-ID:
+          $ref: "#/components/headers/X-Request-ID"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/consentStatusResponse-200"
+          examples:
+            Example:
+              $ref: "#/components/examples/consentStatusResponseExample1"
+
+    NO_CONTENT_204_Consents:
+      description: No Content
+      headers:
+        X-Request-ID:
+          $ref: "#/components/headers/X-Request-ID"
+
+    OK_200_UpdatePsuData:
+      description: OK 
+      headers: 
+        X-Request-ID:
+          $ref: "#/components/headers/X-Request-ID"
+        ASPSP-SCA-Approach:
+          $ref: "#/components/headers/ASPSP-SCA-Approach"
+      content:
+        application/json:
+          schema:
+            oneOf: 
+              - $ref: "#/components/schemas/updatePsuIdenticationResponse" #Update PSU Identification
+              - $ref: "#/components/schemas/updatePsuAuthenticationResponse" #Update PSU Authentication
+              - $ref: "#/components/schemas/selectPsuAuthenticationMethodResponse" #Select Authentication Method
+              - $ref: "#/components/schemas/scaStatusResponse" #Transaction Authorization
+          examples: 
+            "Update PSU Identification - Payment Initiation (Decoupled Approach)":
+              $ref: "#/components/examples/updatePsuIdentificationResponseExample_Decoupled_payments"
+            "Update PSU Authentication - Payment Initiation (Embedded Approach)":
+              $ref: "#/components/examples/updatePsuAuthenticationResponseExample_Embedded_payments"
+            "Select PSU Authentication - Payment Initiation Method (Embedded Approach)":
+              $ref: "#/components/examples/selectPsuAuthenticationMethodResponseExample_Embedded_payments"
+            "Transaction Authorization (Embedded Approach)":
+              $ref: "#/components/examples/transactionAuthorizationResponseExample"
+
+    #####################################################
+    # Negative Responses
+    #####################################################
+
+    BAD_REQUEST_400:
+      description: Bad Request
+      headers:
+        Location:
+          $ref: "#/components/headers/Location"
+        X-Request-ID:
+          $ref: "#/components/headers/X-Request-ID"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/tppMessages400" 
+          example:
+            { "tppMessages": [{
+            "category": "ERROR",
+            "code": "FORMAT_ERROR",
+            "text": "additional text information of the ASPSP up to 512 characters"
+            }]
+            }
+
+    UNAUTHORIZED_401:
+      description: Unauthorized
+      headers:
+        Location:
+          $ref: "#/components/headers/Location"
+        X-Request-ID:
+          $ref: "#/components/headers/X-Request-ID"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/tppMessages401" 
+          example:
+            { "tppMessages": [{
+            "category": "ERROR",
+            "code": "CERTIFICATE_INVALID",
+            "text": "additional text information of the ASPSP up to 512 characters"
+            }]
+            }
+
+    FORBIDDEN_403:
+      description: Forbidden
+      headers:
+        Location:
+          $ref: "#/components/headers/Location"
+        X-Request-ID:
+          $ref: "#/components/headers/X-Request-ID"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/tppMessages403" 
+          example:
+            { "tppMessages": [{
+            "category": "ERROR",
+            "code": "SERVICE_BLOCKED",
+            "text": "additional text information of the ASPSP up to 512 characters"
+            }]
+            }
+
+    NOT_FOUND_404:
+      description: Not found
+      headers:
+        Location:
+          $ref: "#/components/headers/Location"
+        X-Request-ID:
+          $ref: "#/components/headers/X-Request-ID"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/tppMessages404" 
+          example:
+            { "tppMessages": [{
+            "category": "ERROR",
+            "code": "PRODUCT_UNKNOWN",
+            "text": "additional text information of the ASPSP up to 512 characters"
+            }]
+            }
+
+    METHOD_NOT_ALLOWED_405:
+      description: Method Not Allowed
+      headers:
+        Location:
+          $ref: "#/components/headers/Location"
+        X-Request-ID:
+          $ref: "#/components/headers/X-Request-ID"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/tppMessages405" 
+          example:
+            { "tppMessages": [{
+            "category": "ERROR",
+            "code": "SERVICE_INVALID",
+            "text": "additional text information of the ASPSP up to 512 characters"
+            }]
+            }
+
+    NOT_ACCEPTABLE_406:
+      description: Not Acceptable
+      headers:
+        Location:
+          $ref: "#/components/headers/Location"
+        X-Request-ID:
+          $ref: "#/components/headers/X-Request-ID"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/tppMessages406" 
+          example:
+            { "tppMessages": [{
+            "category": "ERROR",
+            "code": "REQUESTED_FORMATS_INVALID",
+            "text": "additional text information of the ASPSP up to 512 characters"
+            }]
+            }
+
+    REQUEST_TIMEOUT_408: 
+      description: Request Timeout
+      headers:
+        Location:
+          $ref: "#/components/headers/Location"
+        X-Request-ID:
+          $ref: "#/components/headers/X-Request-ID"
+      #No TPP-Messages defined
+      #NO RESPONSE BODY
+      
+    CONFLICT_409:
+      description: Conflict
+      headers:
+        Location:
+          $ref: "#/components/headers/Location"
+        X-Request-ID:
+          $ref: "#/components/headers/X-Request-ID"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/tppMessages409"
+      
+    PRECONDITION_FAILED_412:
+      description: Precondition Failed
+      headers:
+        Location:
+          $ref: "#/components/headers/Location"
+        X-Request-ID:
+          $ref: "#/components/headers/X-Request-ID"
+      #No TPP-Messages defined
+      #NO RESPONSE BODY
+
+    UNSUPPORTED_MEDIA_TYPE_415:
+      description: Unsupported Media Type
+      headers:
+        Location:
+          $ref: "#/components/headers/Location"
+        X-Request-ID:
+          $ref: "#/components/headers/X-Request-ID"
+      #No TPP-Messages defined
+      #NO RESPONSE BODY
+
+    TOO_MANY_REQUESTS_429:
+      description: Too Many Requests
+      headers:
+        Location:
+          $ref: "#/components/headers/Location"
+        X-Request-ID:
+          $ref: "#/components/headers/X-Request-ID"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/tppMessages429" 
+          example:
+            { "tppMessages": [{
+            "category": "ERROR",
+            "code": "ACCESS_EXCEEDED",
+            "text": "additional text information of the ASPSP up to 512 characters"
+            }]
+            }
+
+    INTERNAL_SERVER_ERROR_500:
+      description: Internal Server Error
+      headers:
+        Location:
+          $ref: "#/components/headers/Location"
+        X-Request-ID:
+          $ref: "#/components/headers/X-Request-ID"
+      #No TPP-Messages defined
+      #NO RESPONSE BODY
+
+    SERVICE_UNAVAILABLE_503:
+      description: Service Unavailable
+      headers:
+        Location:
+          $ref: "#/components/headers/Location"
+        X-Request-ID:
+          $ref: "#/components/headers/X-Request-ID"
+      #No TPP-Messages defined
+      #NO RESPONSE BODY
+
+  examples:
+    consentsExample_DedicatedAccounts:
+      description: Consent request on dedicated accounts
+      value:
+        {
+        "access": 
+          {
+            "balances": [
+                { "iban": "DE40100100103307118608" },
+                { "iban": "DE02100100109307118603",
+          "currency": "USD"
+                },
+                { "iban": "DE67100100101306118605" }
+              ],
+            "transactions": [
+                { "iban": "DE40100100103307118608" },
+                { "maskedPan": "123456xxxxxx1234" }
+              ]
+           },
+        "recurringIndicator": "true",
+        "validUntil": "2017-11-01",
+        "frequencyPerDay": "4"
+       }
+
+    consentsExample_AccountList:
+      description: Consent on Account List of Available Accounts
+      value:
+        {"access": 
+          {"availableAccounts": "allAccounts"},
+         "recurringIndicator": "false",
+         "validUntil": "2017-08-06",
+         "frequencyPerDay": "1"
+        }
+
+    consentsExample_without_Accounts:
+      description: Consent request on account list or without indication of accounts
+      value:
+        {"access": 
+        {
+          "balances": [],
+          "transactions": []
+        },
+        "recurringIndicator": "true",
+        "validUntil": "2017-11-01",
+        "frequencyPerDay": "4"
+        }
+
+    updatePsuAuthenticationExample_Embedded:
+      description: Update PSU Authentication request body for the embedded approach.
+      value:
+        {
+          "psuData": {"password": "start12"}
+        }
+
+    selectPsuAuthenticationMethodExample_Embedded:
+      description: Select PSU Authentication Method request body for the embedded approach.
+      value:
+        {
+          authenticationMethodId: "myAuthenticationID"
+        }
+
+    transactionAuthorizationExample_Embedded:
+      description: Transaction Authorization request body for the embedded approach.
+      value:
+        {
+         "scaAuthenticationData": "123456"
+        }
+
+    consentsInformationResponseExample:
+      description: Consent request on account list or without indication of accounts
+      value:
+        {
+          "access": {
+            "balances": [
+              {"iban": "DE2310010010123456789"}
+                ], 
+            "transactions": 
+              [
+              {"iban": "DE2310010010123456789"},
+              {"pan": "123456xxxxxx3457"}
+              ]
+            },
+          "recurringIndicator": "true",
+          "validUntil": "2017-11-01",
+          "frequencyPerDay": "4",
+          "consentStatus": "valid",
+          "_links": {"account": {"href": "/v1/accounts"}}
+        }
+
+    consentResponseExample1a_Redirect:
+      description: Consent request Response in case of a redirect
+      value: 
+        { 
+          "consentStatus": "received",
+          "consentId": "1234-wertiq-983",
+          "_links": 
+            {
+            "scaRedirect": {"href": "https://www.testbank.com/authentication/1234-wertiq-983"},
+            "status": {"href": "/v1/consents/1234-wertiq-983/status"},
+            "scaStatus": {"href": "v1/consents/1234-wertiq-983/authorizations/123auth567"}
+            }
+        }
+
+    consentResponseExample1b_Redirect:
+      description: Consent request Response in case of a redirect with a dedicated start of the authorization process
+      value: 
+        { 
+          "consentStatus": "received",
+          "consentId": "1234-wertiq-983",
+          "_links": 
+            {
+            "startAuthorization": {"href": "v1/consents/1234-wertiq-983/authorizations"}
+            }
+        }
+
+    consentResponseExample2_OAuth2:
+      description: Response in case of the OAuth2 approach with an implicit generated authorization resource
+      value: 
+        { 
+        "consentStatus": "received",
+        "consentId": "1234-wertiq-983",
+        "_links": 
+          {
+            "self": {"href": "/v1/consents/1234-wertiq-983"},
+            "scaStatus": {"href": "v1/consents/1234-wertiq-983/authorizations/123auth567"},
+            "scaOAuth": {"href": "https://www.testbank.com/oauth/.well-known/oauth-authorization-server"}
+          }
+        } 
+
+    consentResponseExample3_Decoupled:
+      description: Response in case of the decoupled approach
+      value: 
+        { 
+          "consentStatus": "received",
+          "consentId": "1234-wertiq-983",
+          "_links": 
+            {
+            "startAuthorizationWithPsuIdentification": {"href": "/v1/consents/1234-wertiq-983/authorizations"}
+            }
+        } 
+
+    consentResponseExample4_Embedded:
+      description: Response in case of the embedded approach
+      value: 
+        { 
+          "consentStatus": "received",
+          "consentId": "1234-wertiq-983",
+          "_links": 
+            {
+            "startAuthorizationWithPsuAuthentication": {"href": "/v1/consents/1234-wertiq-983/authorizations"}
+            }
+        }
+
+    consentStatusResponseExample1:
+      description: Response for a consent status request.
+      value:
+        { 
+          "consentStatus": "valid",
+        }
+
+    authorizationListExample:
+      value:
+        { 
+          "authorizationIds": ["123auth456"]
+        }
+
+    startScaProcessResponseExample1:
+      value:
+        { 
+           "scaStatus": "received",
+           "psuMessage": "Please use your BankApp for transaction Authorization.",
+           "_links":
+            {
+              "scaStatus":  {"href":"/v1/payments/qwer3456tzui7890/authorizations/123auth456"}
+            }
+        }
+
+    updatePsuIdentificationResponseExample_Decoupled_payments:
+      description: Response of an Update PSU Identification for a payment initiation request for the decoupled approach.
+      value:
+        { 
+          "scatransactionStatus": "psuIdentified",
+          "psuMessage": "Please use your BankApp for transaction Authorization.",
+          "_links":
+            {
+              "scaStatus":  {"href":"/v1/payments/qwer3456tzui7890/authorizations/123auth456"}
+            }
+        }
+
+    updatePsuAuthenticationResponseExample_Embedded_payments:
+      description: Response of an Update PSU Authentication for a consent request for the embedded approach.
+      value:
+        { 
+          "scaStatus": "psuAuthenticated",
+          _links: {
+           "authorizeTransaction": {"href": "/v1/payments/1234-wertiq-983/authorizations/123auth456"}
+          }
+        }
+
+    selectPsuAuthenticationMethodResponseExample_Embedded_payments:
+      description: Response of a Select PSU Authentication Method payment initiation request for the embedded approach
+      value:
+        { 
+          "scaStatus": "scaMethodSelected",
+          "chosenScaMethod": {
+          "authenticationType": "SMS_OTP",
+          "authenticationMethodId": "myAuthenticationID"},
+          "challengeData": {
+          "otpMaxLength": "6",
+          "otpFormat": "integer"},
+          "_links": {
+             "authorizeTransaction": {"href": "/v1/payments/1234-wertiq-983/authorizations/123auth456"}
+          }
+        }
+
+    transactionAuthorizationResponseExample:
+      description: Response of a Transaction Authorization request for the embedded approach.
+      value:
+        { 
+          "scaStatus": "finalized"
+        }
+
+tags:
+#####################################################
+# Predefined Tags to Group Methods
+#####################################################
+
+  - name: Payment Initiation Service (PIS)
+    description: |
+      The Decription for Payment Initiation Service (PIS) offers the following services:
+        * Initiation and update of a payment request
+        * Status information of a payment
+  - name: Confirmation of Funds Service
+    description: |
+      Confirmation of Funds Service returns a confirmation of funds request at the ASPSP.
+  - name: Account Information Service (AIS)
+    description: |
+      The Account Information Service (AIS) offers the following services
+        * Transaction reports for a given account including balances if applicable.
+        * Balances of a given account,
+        * A list of available accounts,
+        * Account details of a given account or of the list of all accessible accounts relative to a granted consent
+  - name: Common AIS and PIS Services
+    description: |
+      Processes on starting authorizations, update PSU identification or PSU authentication data and explicit 
+      authorization of transactions by using SCA are very similar in PIS and AIS services. 
+      The API calls supporting these processes are described in the following independently from the service/endpoint. 
+      For reasons of clarity, the endpoints are defined always for the Payment Initiation Service, the Payment Cancellation, 
+      the Account Information Service (Consents), and Signing Baskets separately. 
+      These processes usually are used following a hyperlink of the ASPSP.
